@@ -8,165 +8,78 @@
   <title>Finanzas del Hogar - PWA</title>
   <style>
     :root {
-      --bg: #f1f5f9;
-      --surface: #ffffff;
-      --surface-2: #f8fafc;
-      --primary: #0f172a;
-      --accent: #059669;
-      --accent-soft: #d1fae5;
-      --blue: #2563eb;
-      --blue-soft: #dbeafe;
-      --purple: #7c3aed;
-      --purple-soft: #ede9fe;
-      --amber: #d97706;
-      --amber-soft: #fef3c7;
-      --danger: #dc2626;
-      --danger-soft: #fee2e2;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --radius: 14px;
-      --shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+      --bg: #f1f5f9; --surface: #ffffff; --surface-2: #f8fafc; --primary: #0f172a;
+      --accent: #059669; --accent-soft: #d1fae5; --blue: #2563eb; --blue-soft: #dbeafe;
+      --purple: #7c3aed; --purple-soft: #ede9fe; --amber: #d97706; --amber-soft: #fef3c7;
+      --danger: #dc2626; --danger-soft: #fee2e2; --text: #0f172a; --muted: #64748b;
+      --border: #e2e8f0; --radius: 14px; --shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background: var(--bg); color: var(--text); padding-bottom: 98px; }
-
-    header {
-      background: var(--primary); color: #fff; padding: 15px 16px;
-      position: sticky; top: 0; z-index: 20;
-    }
+    header { background: var(--primary); color: #fff; padding: 15px 16px; position: sticky; top: 0; z-index: 20; }
     .header-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; max-width: 780px; margin: 0 auto; }
     header h1 { font-size: 1.05rem; font-weight: 700; }
     .pwa-badge { font-size: 0.7rem; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; padding: 3px 8px; border-radius: 999px; font-weight: 600; }
-
     .month-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; max-width: 780px; margin: 10px auto 0; flex-wrap: wrap; }
-    .month-bar input[type="month"] {
-      background: #1e293b; color: #fff; border: 1px solid #334155;
-      padding: 7px 10px; border-radius: 10px; font-size: 0.9rem; font-weight: 600;
-    }
-    .btn-mini {
-      background: #1e293b; color: #e2e8f0; border: 1px solid #334155;
-      padding: 7px 10px; border-radius: 10px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
-    }
-    #installBtn { background: var(--accent); color: #fff; border-color: var(--accent); display: none; }
-
+    .month-bar input[type="month"] { background: #1e293b; color: #fff; border: 1px solid #334155; padding: 7px 10px; border-radius: 10px; font-size: 0.9rem; font-weight: 600; }
+    .btn-mini { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; padding: 7px 10px; border-radius: 10px; font-size: 0.78rem; font-weight: 600; cursor: pointer; }
     .container { max-width: 780px; margin: 0 auto; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
-    .card {
-      background: var(--surface); border-radius: var(--radius); padding: 15px;
-      box-shadow: var(--shadow); border: 1px solid var(--border);
-    }
+    .card { background: var(--surface); border-radius: var(--radius); padding: 15px; box-shadow: var(--shadow); border: 1px solid var(--border); }
     .card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-
     label { display: block; font-size: 0.76rem; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
-    input[type="text"], input[type="number"], select {
-      width: 100%; padding: 10px 11px; border: 1px solid var(--border); border-radius: 10px;
-      font-size: 0.92rem; background: var(--surface-2); color: var(--text);
-    }
-
+    input[type="text"], input[type="number"], select { width: 100%; padding: 10px 11px; border: 1px solid var(--border); border-radius: 10px; font-size: 0.92rem; background: var(--surface-2); color: var(--text); }
     .stat-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 11px; padding: 10px; }
     .stat-label { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
     .stat-val { font-size: 1.05rem; font-weight: 800; margin-top: 2px; }
     .stat-sub { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-    .text-green { color: var(--accent); }
-    .text-red { color: var(--danger); }
-    .text-blue { color: var(--blue); }
-    .text-amber { color: var(--amber); }
-
+    .text-green { color: var(--accent); } .text-red { color: var(--danger); } .text-blue { color: var(--blue); } .text-amber { color: var(--amber); }
     .alert-box { border-radius: 11px; padding: 11px 12px; font-size: 0.82rem; line-height: 1.4; margin-top: 10px; }
     .alert-info { background: var(--blue-soft); color: #1e3a8a; border: 1px solid #bfdbfe; }
     .alert-warn { background: var(--amber-soft); color: #78350f; border: 1px solid #fde68a; }
     .alert-ok { background: var(--accent-soft); color: #064e3b; border: 1px solid #a7f3d0; }
-
     .chip-group { display: flex; gap: 6px; flex-wrap: wrap; }
-    .chip {
-      flex: 1; min-width: 88px; text-align: center; padding: 9px 8px; border-radius: 10px;
-      border: 1.5px solid var(--border); background: var(--surface-2); font-size: 0.8rem;
-      font-weight: 600; cursor: pointer;
-    }
+    .chip { flex: 1; min-width: 88px; text-align: center; padding: 9px 8px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface-2); font-size: 0.8rem; font-weight: 600; cursor: pointer; }
     .chip.active { border-color: var(--primary); background: var(--primary); color: #fff; }
     .chip.active-pay { border-color: var(--blue); background: var(--blue-soft); color: #1e40af; }
-
-    .btn-primary {
-      width: 100%; background: var(--accent); color: #fff; border: none; padding: 12px;
-      border-radius: 11px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 10px;
-    }
-    .btn-secondary {
-      background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
-      padding: 8px 11px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
-    }
-
-    .expense-item {
-      border: 1px solid var(--border); border-radius: 12px; padding: 11px;
-      display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
-      background: #fff; margin-bottom: 8px;
-    }
+    .btn-primary { width: 100%; background: var(--accent); color: #fff; border: none; padding: 12px; border-radius: 11px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 10px; }
+    .btn-secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); padding: 8px 11px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+    .expense-item { border: 1px solid var(--border); border-radius: 12px; padding: 11px; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; background: #fff; margin-bottom: 8px; }
     .expense-title { font-weight: 700; font-size: 0.9rem; }
     .expense-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
     .badge { font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
-    .b-shared { background: var(--blue-soft); color: #1e40af; }
-    .b-luis { background: var(--accent-soft); color: #065f46; }
-    .b-wife { background: var(--purple-soft); color: #5b21b6; }
-    .b-pay { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
-    .b-tc { background: var(--amber-soft); color: #92400e; }
-    .b-pers { background: #fce7f3; color: #9d174d; }
-
+    .b-shared { background: var(--blue-soft); color: #1e40af; } .b-luis { background: var(--accent-soft); color: #065f46; } .b-wife { background: var(--purple-soft); color: #5b21b6; }
+    .b-pay { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; } .b-tc { background: var(--amber-soft); color: #92400e; } .b-pers { background: #fce7f3; color: #9d174d; }
     .expense-right { text-align: right; min-width: 105px; }
     .expense-amount { font-weight: 800; font-size: 0.96rem; }
     .expense-split { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
     .expense-actions { margin-top: 6px; display: flex; gap: 6px; justify-content: flex-end; }
-    .icon-btn {
-      background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px;
-      padding: 4px 8px; font-size: 0.75rem; cursor: pointer;
-    }
-
-    /* Gráficos y Metas */
+    .icon-btn { background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; }
     .bar-row { margin-bottom: 11px; }
     .bar-head { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; gap: 8px; }
     .bar-track { width: 100%; height: 11px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 999px; transition: width 0.25s ease; }
-    .bar-general { background: var(--blue); }
-    .bar-personal { background: var(--purple); }
-    .bar-goal { background: var(--accent); }
-
-    .goal-card {
-      border: 1px solid var(--border); border-radius: 12px; padding: 12px;
-      background: var(--surface-2); margin-bottom: 10px;
-    }
+    .bar-fill { height: 100%; border-radius: 999px; }
+    .bar-general { background: var(--blue); } .bar-personal { background: var(--purple); } .bar-goal { background: var(--accent); }
+    .goal-card { border: 1px solid var(--border); border-radius: 12px; padding: 12px; background: var(--surface-2); margin-bottom: 10px; }
     .goal-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
     .goal-name { font-weight: 700; font-size: 0.94rem; }
     .goal-pct { font-weight: 800; font-size: 0.86rem; color: var(--accent); }
     .goal-nums { font-size: 0.78rem; color: var(--muted); margin-bottom: 7px; }
     .goal-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-    .btn-goal {
-      background: #fff; border: 1px solid var(--border); border-radius: 8px;
-      padding: 6px 9px; font-size: 0.75rem; font-weight: 700; cursor: pointer; color: var(--text);
-    }
+    .btn-goal { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 6px 9px; font-size: 0.75rem; font-weight: 700; cursor: pointer; color: var(--text); }
     .btn-goal.add { background: var(--accent-soft); border-color: #a7f3d0; color: #065f46; }
     .btn-goal.del { background: var(--danger-soft); border-color: #fecaca; color: #991b1b; }
-
-    .tabs {
-      position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
-      border-top: 1px solid var(--border); display: flex; justify-content: space-around;
-      padding: 8px 2px calc(8px + env(safe-area-inset-bottom)); z-index: 99;
-    }
-    .tab-btn {
-      flex: 1; background: none; border: none; font-size: 0.68rem; font-weight: 700;
-      color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer;
-    }
+    .tabs { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 2px calc(8px + env(safe-area-inset-bottom)); z-index: 99; }
+    .tab-btn { flex: 1; background: none; border: none; font-size: 0.68rem; font-weight: 700; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
     .tab-btn.active { color: var(--primary); }
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
-
 <header>
   <div class="header-top">
-    <h1>Finanzas del Hogar <span class="pwa-badge" id="offlineStatus">PWA v6</span></h1>
-    <button class="btn-mini" id="installBtn" type="button">+ Instalar App</button>
+    <h1>Finanzas del Hogar <span class="pwa-badge">Estable</span></h1>
   </div>
   <div class="month-bar">
     <input type="month" id="monthPicker" />
@@ -178,101 +91,44 @@
 </header>
 
 <main class="container">
-  <!-- 1. BALANCE -->
   <section id="sec-resumen" class="tab-section">
     <div class="card">
-      <div class="card-title">
-        <span>1. Ingresos Líquidos del Mes (CLP)</span>
-        <span style="font-size:0.75rem; color:var(--muted);" id="ratioIngresoLabel">44% / 56%</span>
-      </div>
+      <div class="card-title"><span>1. Ingresos Líquidos del Mes (CLP)</span><span style="font-size:0.75rem; color:var(--muted);" id="ratioIngresoLabel"></span></div>
       <div class="grid-2">
-        <div>
-          <label for="incLuis">Ingreso Luis ($)</label>
-          <input type="number" id="incLuis" step="10000" />
-        </div>
-        <div>
-          <label for="incWife">Ingreso Esposa ($)</label>
-          <input type="number" id="incWife" step="10000" />
-        </div>
+        <div><label for="incLuis">Ingreso Luis ($)</label><input type="number" id="incLuis" step="10000" /></div>
+        <div><label for="incWife">Ingreso Esposa ($)</label><input type="number" id="incWife" step="10000" /></div>
       </div>
-      <div style="margin-top:10px;">
-        <label for="targetPocket">Meta mínima libre en tu bolsillo a fin de mes ($)</label>
-        <input type="number" id="targetPocket" step="10000" />
-      </div>
+      <div style="margin-top:10px;"><label for="targetPocket">Meta mínima libre en tu bolsillo ($)</label><input type="number" id="targetPocket" step="10000" /></div>
     </div>
-
     <div class="card">
       <div class="card-title"><span>2. Balance Real vs. Reparto Justo</span></div>
       <div class="grid-2">
-        <div class="stat-box">
-          <div class="stat-label">Gasto Total Hogar</div>
-          <div class="stat-val" id="totHogar">$0</div>
-          <div class="stat-sub" id="subGastosPers">Pers: $0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Te queda libre hoy</div>
-          <div class="stat-val" id="luisLibreHoy">$0</div>
-          <div class="stat-sub" id="wifeLibreHoy">Esposa libre: $0</div>
-        </div>
+        <div class="stat-box"><div class="stat-label">Gasto Total Hogar</div><div class="stat-val" id="totHogar">$0</div><div class="stat-sub" id="subGastosPers">Pers: $0</div></div>
+        <div class="stat-box"><div class="stat-label">Te queda libre hoy</div><div class="stat-val" id="luisLibreHoy">$0</div><div class="stat-sub" id="wifeLibreHoy">Esposa libre: $0</div></div>
       </div>
-
       <div class="grid-2" style="margin-top:10px;">
-        <div class="stat-box">
-          <div class="stat-label">Aporte Real Actual</div>
-          <div class="stat-val text-blue" id="aporteRealLuis">$0</div>
-          <div class="stat-sub" id="aporteRealWife">Ella aporta: $0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Aporte Justo Proporcional</div>
-          <div class="stat-val text-green" id="aporteJustoLuis">$0</div>
-          <div class="stat-sub" id="aporteJustoWife">Ella debería: $0</div>
-        </div>
+        <div class="stat-box"><div class="stat-label">Aporte Real Actual</div><div class="stat-val text-blue" id="aporteRealLuis">$0</div><div class="stat-sub" id="aporteRealWife">Ella aporta: $0</div></div>
+        <div class="stat-box"><div class="stat-label">Aporte Justo Proporcional</div><div class="stat-val text-green" id="aporteJustoLuis">$0</div><div class="stat-sub" id="aporteJustoWife">Ella debería: $0</div></div>
       </div>
-
-      <div id="consejoBox" class="alert-box alert-info">Cargando análisis...</div>
+      <div id="consejoBox" class="alert-box alert-info"></div>
     </div>
-
     <div class="card">
       <div class="card-title"><span>3. Desglose por Método de Pago</span></div>
       <div class="grid-3">
-        <div class="stat-box">
-          <div class="stat-label">Transferencia</div>
-          <div class="stat-val" id="payTransf">$0</div>
-          <div class="stat-sub" id="payTransfSub">L: $0 | E: $0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Débito</div>
-          <div class="stat-val" id="payDebito">$0</div>
-          <div class="stat-sub" id="payDebitoSub">L: $0 | E: $0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">T. Crédito</div>
-          <div class="stat-val text-amber" id="payTC">$0</div>
-          <div class="stat-sub" id="payTCSub">L: $0 | E: $0</div>
-        </div>
+        <div class="stat-box"><div class="stat-label">Transferencia</div><div class="stat-val" id="payTransf">$0</div><div class="stat-sub" id="payTransfSub"></div></div>
+        <div class="stat-box"><div class="stat-label">Débito</div><div class="stat-val" id="payDebito">$0</div><div class="stat-sub" id="payDebitoSub"></div></div>
+        <div class="stat-box"><div class="stat-label">T. Crédito</div><div class="stat-val text-amber" id="payTC">$0</div><div class="stat-sub" id="payTCSub"></div></div>
       </div>
       <div id="tcAlertBox" class="alert-box alert-warn hidden"></div>
     </div>
   </section>
 
-  <!-- 2. REGISTRAR -->
   <section id="sec-agregar" class="tab-section hidden">
     <div class="card">
-      <div class="card-title">
-        <span id="formTitle">Registrar Nuevo Gasto</span>
-        <button class="btn-secondary hidden" id="cancelEditBtn" type="button">Cancelar edición</button>
-      </div>
-
-      <div style="margin-bottom:10px;">
-        <label for="expDesc">Concepto o descripción</label>
-        <input type="text" id="expDesc" placeholder="Ej: Arriendo, Supermercado, Cambio de aceite, Médico..." />
-      </div>
-
+      <div class="card-title"><span id="formTitle">Registrar Nuevo Gasto</span><button class="btn-secondary hidden" id="cancelEditBtn" type="button">Cancelar</button></div>
+      <div style="margin-bottom:10px;"><label for="expDesc">Concepto o descripción</label><input type="text" id="expDesc" placeholder="Ej: Supermercado, Médico, Bencina..." /></div>
       <div class="grid-2" style="margin-bottom:10px;">
-        <div>
-          <label for="expAmount">Monto total ($ CLP)</label>
-          <input type="number" id="expAmount" placeholder="Ej: 85000" />
-        </div>
+        <div><label for="expAmount">Monto total ($ CLP)</label><input type="number" id="expAmount" /></div>
         <div>
           <label for="expCat">Categoría</label>
           <select id="expCat">
@@ -286,7 +142,6 @@
           </select>
         </div>
       </div>
-
       <div style="margin-bottom:10px;">
         <label>¿Quién asume este gasto?</label>
         <div class="chip-group" id="splitTypeChips">
@@ -297,66 +152,41 @@
           <div class="chip" data-val="custom">% Personalizado</div>
         </div>
       </div>
-
       <div id="customSplitBox" class="hidden" style="margin-bottom:10px; background:var(--surface-2); padding:10px; border-radius:10px;">
-        <label for="customLuisPct">Porcentaje que paga Luis: <strong id="customPctLabel">50%</strong> (Esposa: <span id="customWifePctLabel">50%</span>)</label>
+        <label for="customLuisPct">Luis: <strong id="customPctLabel">50%</strong> (Esposa: <span id="customWifePctLabel">50%</span>)</label>
         <input type="range" id="customLuisPct" min="0" max="100" value="50" style="width:100%;" />
       </div>
-
       <div style="margin-bottom:10px;">
-        <label>Método de pago utilizado</label>
+        <label>Método de pago</label>
         <div class="chip-group" id="payMethodChips">
           <div class="chip active-pay" data-val="Transferencia">Transferencia</div>
           <div class="chip" data-val="Débito">Débito</div>
           <div class="chip" data-val="Tarjeta de Crédito">Tarjeta de Crédito</div>
         </div>
       </div>
-
       <div style="margin-bottom:6px;">
-        <label>Alcance del gasto</label>
+        <label>Alcance</label>
         <div class="chip-group" id="scopeChips">
-          <div class="chip active" data-val="Hogar">Gasto del Hogar / Familia</div>
-          <div class="chip" data-val="Personal">Gasto Personal Individual</div>
+          <div class="chip active" data-val="Hogar">Gasto del Hogar</div>
+          <div class="chip" data-val="Personal">Gasto Personal</div>
         </div>
       </div>
-
       <button class="btn-primary" id="saveExpBtn" type="button">Guardar Gasto</button>
     </div>
   </section>
 
-  <!-- 3. MOVIMIENTOS -->
   <section id="sec-lista" class="tab-section hidden">
     <div class="card">
       <div class="card-title">
-        <span>Movimientos del Mes (<span id="countItems">0</span>)</span>
-        <div style="display:flex; gap:6px;">
-          <button class="btn-secondary" id="waBtn" type="button">WhatsApp</button>
-          <button class="btn-secondary" id="csvBtn" type="button">CSV</button>
-        </div>
+        <span>Movimientos (<span id="countItems">0</span>)</span>
+        <div style="display:flex; gap:6px;"><button class="btn-secondary" id="waBtn" type="button">WhatsApp</button><button class="btn-secondary" id="csvBtn" type="button">CSV</button></div>
       </div>
-
       <div class="grid-3" style="margin-bottom:10px;">
-        <select id="filterOwner">
-          <option value="ALL">Todos (Responsable)</option>
-          <option value="SHARED">Compartidos</option>
-          <option value="LUIS">100% Luis</option>
-          <option value="WIFE">100% Esposa</option>
-        </select>
-        <select id="filterPay">
-          <option value="ALL">Todos (Pago)</option>
-          <option value="Transferencia">Transferencia</option>
-          <option value="Débito">Débito</option>
-          <option value="Tarjeta de Crédito">T. Crédito</option>
-        </select>
-        <select id="filterScope">
-          <option value="ALL">Hogar + Personal</option>
-          <option value="Hogar">Solo Hogar</option>
-          <option value="Personal">Solo Personal</option>
-        </select>
+        <select id="filterOwner"><option value="ALL">Todos</option><option value="SHARED">Compartidos</option><option value="LUIS">100% Luis</option><option value="WIFE">100% Esposa</option></select>
+        <select id="filterPay"><option value="ALL">Todo Pago</option><option value="Transferencia">Transferencia</option><option value="Débito">Débito</option><option value="Tarjeta de Crédito">T. Crédito</option></select>
+        <select id="filterScope"><option value="ALL">Hogar + Pers.</option><option value="Hogar">Solo Hogar</option><option value="Personal">Solo Personal</option></select>
       </div>
-
       <div id="expenseList"></div>
-
       <div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--border); display:flex; gap:8px; flex-wrap:wrap;">
         <button class="btn-secondary" id="exportJsonBtn" type="button">Respaldar JSON</button>
         <button class="btn-secondary" id="importJsonBtn" type="button">Restaurar JSON</button>
@@ -365,80 +195,83 @@
     </div>
   </section>
 
-  <!-- 4. GRÁFICOS -->
   <section id="sec-graficos" class="tab-section hidden">
     <div class="card">
-      <div class="card-title"><span>Resumen: General (Hogar) vs. Personal</span></div>
+      <div class="card-title"><span>General (Hogar) vs. Personal</span></div>
       <div class="grid-2">
-        <div class="stat-box">
-          <div class="stat-label">Total General (Hogar)</div>
-          <div class="stat-val text-blue" id="chartTotGeneral">$0</div>
-          <div class="stat-sub" id="chartPctGeneral">0% del total</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Total Personal</div>
-          <div class="stat-val" style="color:var(--purple);" id="chartTotPersonal">$0</div>
-          <div class="stat-sub" id="chartSubPersonal">Luis: $0 | Esposa: $0</div>
-        </div>
+        <div class="stat-box"><div class="stat-label">Total General</div><div class="stat-val text-blue" id="chartTotGeneral">$0</div><div class="stat-sub" id="chartPctGeneral"></div></div>
+        <div class="stat-box"><div class="stat-label">Total Personal</div><div class="stat-val" style="color:var(--purple);" id="chartTotPersonal">$0</div><div class="stat-sub" id="chartSubPersonal"></div></div>
       </div>
     </div>
-
-    <div class="card">
-      <div class="card-title"><span>En qué se gasta más — General (Hogar)</span></div>
-      <div id="chartGeneralBars"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><span>En qué se gasta más — Personal</span></div>
-      <div id="chartPersonalBars"></div>
-    </div>
+    <div class="card"><div class="card-title"><span>Categorías — General (Hogar)</span></div><div id="chartGeneralBars"></div></div>
+    <div class="card"><div class="card-title"><span>Categorías — Personal</span></div><div id="chartPersonalBars"></div></div>
   </section>
 
-  <!-- 5. METAS DE AHORRO -->
   <section id="sec-metas" class="tab-section hidden">
     <div class="card">
-      <div class="card-title"><span>Resumen de Ahorro por Metas</span></div>
+      <div class="card-title"><span>Ahorro por Metas</span></div>
       <div class="grid-2">
-        <div class="stat-box">
-          <div class="stat-label">Total Ahorrado en Metas</div>
-          <div class="stat-val text-green" id="goalsSavedTotal">$0</div>
-          <div class="stat-sub" id="goalsTargetTotal">Meta total: $0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Tu saldo libre estimado este mes</div>
-          <div class="stat-val text-blue" id="goalsMonthFree">$0</div>
-          <div class="stat-sub">Referencia del mes seleccionado</div>
-        </div>
+        <div class="stat-box"><div class="stat-label">Ahorrado en Metas</div><div class="stat-val text-green" id="goalsSavedTotal">$0</div><div class="stat-sub" id="goalsTargetTotal"></div></div>
+        <div class="stat-box"><div class="stat-label">Libre estimado este mes</div><div class="stat-val text-blue" id="goalsMonthFree">$0</div><div class="stat-sub">Mes actual</div></div>
       </div>
     </div>
-
     <div class="card">
-      <div class="card-title"><span>Nueva Meta de Ahorro</span></div>
-      <div style="margin-bottom:10px;">
-        <label for="goalName">Nombre de la meta</label>
-        <input type="text" id="goalName" placeholder="Ej: Fondo de emergencia, Mantención auto, Paseos..." />
-      </div>
+      <div class="card-title"><span>Nueva Meta</span></div>
+      <div style="margin-bottom:10px;"><label for="goalName">Nombre</label><input type="text" id="goalName" placeholder="Ej: Fondo emergencia" /></div>
       <div class="grid-2">
-        <div>
-          <label for="goalTarget">Monto objetivo ($ CLP)</label>
-          <input type="number" id="goalTarget" placeholder="Ej: 500000" />
-        </div>
-        <div>
-          <label for="goalCurrent">Monto inicial ahorrado ($ CLP)</label>
-          <input type="number" id="goalCurrent" placeholder="0" value="0" />
-        </div>
+        <div><label for="goalTarget">Meta ($ CLP)</label><input type="number" id="goalTarget" /></div>
+        <div><label for="goalCurrent">Inicial ($ CLP)</label><input type="number" id="goalCurrent" value="0" /></div>
       </div>
       <button class="btn-primary" id="saveGoalBtn" type="button">Crear Meta</button>
     </div>
-
-    <div class="card">
-      <div class="card-title"><span>Mis Metas (<span id="goalsCount">0</span>)</span></div>
-      <div id="goalsList"></div>
-    </div>
+    <div class="card"><div class="card-title"><span>Mis Metas (<span id="goalsCount">0</span>)</span></div><div id="goalsList"></div></div>
   </section>
 </main>
 
 <nav class="tabs" id="bottomTabs">
   <button class="tab-btn active" data-tab="resumen" type="button"><span>📊</span><span>Balance</span></button>
   <button class="tab-btn" data-tab="agregar" type="button"><span>➕</span><span>Registrar</span></button>
-  <button class="tab-btn" data-tab="lista" type="button"><span>📋</sp
+  <button class="tab-btn" data-tab="lista" type="button"><span>📋</span><span>Movimientos</span></button>
+  <button class="tab-btn" data-tab="graficos" type="button"><span>📈</span><span>Gráficos</span></button>
+  <button class="tab-btn" data-tab="metas" type="button"><span>🎯</span><span>Metas</span></button>
+</nav>
+
+<script>
+(function () {
+  const STORAGE_KEY = 'finanzas_hogar_pwa_v6';
+  const LEGACY_KEYS = ['finanzas_hogar_pwa_v5', 'finanzas_hogar_pwa_v3', 'finanzas_hogar_pwa_v2', 'finanzas_hogar_pwa_v1'];
+  let db = {};
+  try { db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {}; } catch (_) { db = {}; }
+  if (!Object.keys(db).length) {
+    for (const k of LEGACY_KEYS) {
+      try { const old = JSON.parse(localStorage.getItem(k) || 'null'); if (old && typeof old === 'object' && Object.keys(old).length) { db = old; break; } } catch (_) {}
+    }
+  }
+  if (!Array.isArray(db._goals)) {
+    db._goals = [{ id: 'g1', name: 'Colchón / Imprevistos', target: 350000, current: 0 }];
+  }
+
+  let editingId = null, currentSplit = '50_50', currentPay = 'Transferencia', currentScope = 'Hogar';
+  const monthPicker = document.getElementById('monthPicker');
+  const now = new Date();
+  monthPicker.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  function saveDB() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } catch (_) {} }
+  function ensureMonth(m) {
+    const k = m || monthPicker.value || '2026-11';
+    if (!db[k]) { db[k] = { incLuis: 1450000, incWife: 1850000, targetPocket: 350000, expenses: [] }; saveDB(); }
+    return db[k];
+  }
+  function fmt(n) { return '$' + Math.round(Number(n) || 0).toLocaleString('es-CL'); }
+  function getLuisPct(e) {
+    if (e.split === '50_50') return 50;
+    if (e.split === '70_30') return 70;
+    if (e.split === '100_luis') return 100;
+    if (e.split === '100_wife') return 0;
+    return Number(e.luisPct ?? 50);
+  }
+  function switchTab(tab) {
+    const map = { resumen: 'sec-resumen', agregar: 'sec-agregar', lista: 'sec-lista', graficos: 'sec-graficos', metas: 'sec-metas' };
+    const t = map[tab] || 'sec-resumen';
+    document.querySelectorAll('.tab-section').forEach(s => s.classList.toggle('hidden', s.id !== t));
+    document.querySelectorAll('#bottomTabs .tab-btn').forEach(b =>
