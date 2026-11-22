@@ -4,10 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#0f172a" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Finanzas Hogar" />
   <link rel="manifest" href="./manifest.json" />
   <title>Finanzas del Hogar - PWA</title>
   <style>
@@ -25,7 +21,6 @@
       --amber: #d97706;
       --amber-soft: #fef3c7;
       --danger: #dc2626;
-      --danger-soft: #fee2e2;
       --text: #0f172a;
       --muted: #64748b;
       --border: #e2e8f0;
@@ -33,20 +28,15 @@
       --shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 96px; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 96px; }
 
     header {
-      background: var(--primary);
-      color: #fff;
-      padding: 16px 16px 14px;
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      background: var(--primary); color: #fff; padding: 15px 16px;
+      position: sticky; top: 0; z-index: 20;
     }
     .header-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; max-width: 780px; margin: 0 auto; }
-    header h1 { font-size: 1.08rem; font-weight: 700; letter-spacing: -0.2px; }
+    header h1 { font-size: 1.05rem; font-weight: 700; }
     .pwa-badge { font-size: 0.7rem; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; padding: 3px 8px; border-radius: 999px; font-weight: 600; }
 
     .month-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; max-width: 780px; margin: 10px auto 0; flex-wrap: wrap; }
@@ -58,11 +48,9 @@
       background: #1e293b; color: #e2e8f0; border: 1px solid #334155;
       padding: 7px 10px; border-radius: 10px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
     }
-    .btn-mini:active { transform: scale(0.97); }
     #installBtn { background: var(--accent); color: #fff; border-color: var(--accent); display: none; }
 
     .container { max-width: 780px; margin: 0 auto; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
-
     .card {
       background: var(--surface); border-radius: var(--radius); padding: 15px;
       box-shadow: var(--shadow); border: 1px solid var(--border);
@@ -75,13 +63,10 @@
     label { display: block; font-size: 0.76rem; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
     input[type="text"], input[type="number"], select {
       width: 100%; padding: 10px 11px; border: 1px solid var(--border); border-radius: 10px;
-      font-size: 0.92rem; background: var(--surface-2); color: var(--text); outline: none;
+      font-size: 0.92rem; background: var(--surface-2); color: var(--text);
     }
-    input:focus, select:focus { border-color: var(--blue); background: #fff; }
 
-    .stat-box {
-      background: var(--surface-2); border: 1px solid var(--border); border-radius: 11px; padding: 10px;
-    }
+    .stat-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 11px; padding: 10px; }
     .stat-label { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
     .stat-val { font-size: 1.05rem; font-weight: 800; margin-top: 2px; }
     .stat-sub { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
@@ -90,9 +75,7 @@
     .text-blue { color: var(--blue); }
     .text-amber { color: var(--amber); }
 
-    .alert-box {
-      border-radius: 11px; padding: 11px 12px; font-size: 0.82rem; line-height: 1.4; margin-top: 10px;
-    }
+    .alert-box { border-radius: 11px; padding: 11px 12px; font-size: 0.82rem; line-height: 1.4; margin-top: 10px; }
     .alert-info { background: var(--blue-soft); color: #1e3a8a; border: 1px solid #bfdbfe; }
     .alert-warn { background: var(--amber-soft); color: #78350f; border: 1px solid #fde68a; }
     .alert-ok { background: var(--accent-soft); color: #064e3b; border: 1px solid #a7f3d0; }
@@ -101,7 +84,7 @@
     .chip {
       flex: 1; min-width: 88px; text-align: center; padding: 9px 8px; border-radius: 10px;
       border: 1.5px solid var(--border); background: var(--surface-2); font-size: 0.8rem;
-      font-weight: 600; cursor: pointer; user-select: none; transition: 0.15s;
+      font-weight: 600; cursor: pointer;
     }
     .chip.active { border-color: var(--primary); background: var(--primary); color: #fff; }
     .chip.active-pay { border-color: var(--blue); background: var(--blue-soft); color: #1e40af; }
@@ -110,10 +93,9 @@
       width: 100%; background: var(--accent); color: #fff; border: none; padding: 12px;
       border-radius: 11px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 10px;
     }
-    .btn-primary:active { transform: scale(0.99); }
     .btn-secondary {
       background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
-      padding: 9px 12px; border-radius: 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+      padding: 8px 11px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
     }
 
     .expense-item {
@@ -123,9 +105,7 @@
     }
     .expense-title { font-weight: 700; font-size: 0.9rem; }
     .expense-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
-    .badge {
-      font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 6px;
-    }
+    .badge { font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
     .b-shared { background: var(--blue-soft); color: #1e40af; }
     .b-luis { background: var(--accent-soft); color: #065f46; }
     .b-wife { background: var(--purple-soft); color: #5b21b6; }
@@ -150,7 +130,6 @@
     .tab-btn {
       flex: 1; background: none; border: none; font-size: 0.78rem; font-weight: 700;
       color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer;
-      touch-action: manipulation;
     }
     .tab-btn.active { color: var(--primary); }
     .hidden { display: none !important; }
@@ -173,7 +152,6 @@
 </header>
 
 <main class="container">
-  <!-- SECCIÓN 1: RESUMEN Y EQUILIBRIO -->
   <section id="sec-resumen" class="tab-section">
     <div class="card">
       <div class="card-title">
@@ -250,7 +228,6 @@
     </div>
   </section>
 
-  <!-- SECCIÓN 2: AGREGAR / EDITAR GASTO -->
   <section id="sec-agregar" class="tab-section hidden">
     <div class="card">
       <div class="card-title">
@@ -319,7 +296,6 @@
     </div>
   </section>
 
-  <!-- SECCIÓN 3: LISTADO Y EXPORTACIÓN -->
   <section id="sec-lista" class="tab-section hidden">
     <div class="card">
       <div class="card-title">
@@ -362,26 +338,16 @@
 </main>
 
 <nav class="tabs" id="bottomTabs">
-  <button class="tab-btn active" data-tab="resumen" type="button">
-    <span>📊</span><span>Balance</span>
-  </button>
-  <button class="tab-btn" data-tab="agregar" type="button">
-    <span>➕</span><span>Registrar</span>
-  </button>
-  <button class="tab-btn" data-tab="lista" type="button">
-    <span>📋</span><span>Movimientos</span>
-  </button>
+  <button class="tab-btn active" data-tab="resumen" type="button"><span>📊</span><span>Balance</span></button>
+  <button class="tab-btn" data-tab="agregar" type="button"><span>➕</span><span>Registrar</span></button>
+  <button class="tab-btn" data-tab="lista" type="button"><span>📋</span><span>Movimientos</span></button>
 </nav>
 
 <script>
   (function () {
-    const STORAGE_KEY = 'finanzas_hogar_pwa_v2';
+    const STORAGE_KEY = 'finanzas_hogar_pwa_v3';
     let db = {};
-    try {
-      db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {};
-    } catch (_) {
-      db = {};
-    }
+    try { db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {}; } catch (_) { db = {}; }
 
     let editingId = null;
     let currentSplit = '50_50';
@@ -393,22 +359,16 @@
     monthPicker.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
     function saveDB() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-      } catch (_) {}
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } catch (_) {}
     }
 
     function ensureMonth(m) {
-      if (!m) return;
-      if (!db[m]) {
-        db[m] = {
-          incLuis: 1450000,
-          incWife: 1850000,
-          targetPocket: 350000,
-          expenses: []
-        };
+      const key = m || monthPicker.value || '2026-11';
+      if (!db[key]) {
+        db[key] = { incLuis: 1450000, incWife: 1850000, targetPocket: 350000, expenses: [] };
         saveDB();
       }
+      return db[key];
     }
 
     function fmt(n) {
@@ -416,21 +376,21 @@
     }
 
     function switchTab(tab) {
-      ['resumen', 'agregar', 'lista'].forEach((name) => {
-        const sec = document.getElementById(`sec-${name}`);
-        if (sec) sec.classList.toggle('hidden', name !== tab);
+      const map = { resumen: 'sec-resumen', agregar: 'sec-agregar', lista: 'sec-lista' };
+      const targetId = map[tab] || 'sec-resumen';
+      document.querySelectorAll('.tab-section').forEach((sec) => {
+        if (sec.id === targetId) sec.classList.remove('hidden');
+        else sec.classList.add('hidden');
       });
       document.querySelectorAll('#bottomTabs .tab-btn').forEach((btn) => {
         btn.classList.toggle('active', btn.dataset.tab === tab);
       });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo(0, 0);
     }
 
     function selectSplitType(val) {
       currentSplit = val;
-      document.querySelectorAll('#splitTypeChips .chip').forEach((c) => {
-        c.classList.toggle('active', c.dataset.val === val);
-      });
+      document.querySelectorAll('#splitTypeChips .chip').forEach((c) => c.classList.toggle('active', c.dataset.val === val));
       document.getElementById('customSplitBox').classList.toggle('hidden', val !== 'custom');
     }
 
@@ -442,26 +402,12 @@
 
     function selectPayMethod(val) {
       currentPay = val;
-      document.querySelectorAll('#payMethodChips .chip').forEach((c) => {
-        c.classList.toggle('active-pay', c.dataset.val === val);
-      });
+      document.querySelectorAll('#payMethodChips .chip').forEach((c) => c.classList.toggle('active-pay', c.dataset.val === val));
     }
 
     function selectScope(val) {
       currentScope = val;
-      document.querySelectorAll('#scopeChips .chip').forEach((c) => {
-        c.classList.toggle('active', c.dataset.val === val);
-      });
-    }
-
-    function saveIncomes() {
-      const m = monthPicker.value;
-      ensureMonth(m);
-      db[m].incLuis = Number(document.getElementById('incLuis').value) || 0;
-      db[m].incWife = Number(document.getElementById('incWife').value) || 0;
-      db[m].targetPocket = Number(document.getElementById('targetPocket').value) || 0;
-      saveDB();
-      renderAll();
+      document.querySelectorAll('#scopeChips .chip').forEach((c) => c.classList.toggle('active', c.dataset.val === val));
     }
 
     function getLuisPct(exp) {
@@ -478,4 +424,355 @@
       document.getElementById('saveExpBtn').textContent = 'Guardar Gasto';
       document.getElementById('cancelEditBtn').classList.add('hidden');
       document.getElementById('expDesc').value = '';
-      document.getElementByI
+      document.getElementById('expAmount').value = '';
+      selectSplitType('50_50');
+      selectPayMethod('Transferencia');
+      selectScope('Hogar');
+    }
+
+    function saveExpense() {
+      const desc = document.getElementById('expDesc').value.trim();
+      const amount = Number(document.getElementById('expAmount').value);
+      const cat = document.getElementById('expCat').value;
+      if (!desc || !amount || amount <= 0) {
+        alert('Ingresa una descripción y un monto válido.');
+        return;
+      }
+
+      const data = ensureMonth(monthPicker.value);
+      const luisPct = currentSplit === 'custom'
+        ? Number(document.getElementById('customLuisPct').value)
+        : getLuisPct({ split: currentSplit });
+
+      const payload = {
+        id: editingId || Date.now().toString(),
+        desc, amount, cat, split: currentSplit, luisPct, pay: currentPay, scope: currentScope
+      };
+
+      if (editingId) {
+        const idx = data.expenses.findIndex((e) => e.id === editingId);
+        if (idx !== -1) data.expenses[idx] = payload;
+      } else {
+        data.expenses.unshift(payload);
+      }
+
+      saveDB();
+      resetForm();
+      renderAll();
+      switchTab('lista');
+    }
+
+    function editExpense(id) {
+      const data = ensureMonth(monthPicker.value);
+      const exp = data.expenses.find((e) => e.id === id);
+      if (!exp) return;
+
+      editingId = id;
+      document.getElementById('formTitle').textContent = 'Editar Gasto';
+      document.getElementById('saveExpBtn').textContent = 'Actualizar Gasto';
+      document.getElementById('cancelEditBtn').classList.remove('hidden');
+      document.getElementById('expDesc').value = exp.desc;
+      document.getElementById('expAmount').value = exp.amount;
+      document.getElementById('expCat').value = exp.cat;
+      selectSplitType(exp.split);
+      if (exp.split === 'custom') {
+        document.getElementById('customLuisPct').value = exp.luisPct;
+        updateCustomPctLabel();
+      }
+      selectPayMethod(exp.pay || 'Transferencia');
+      selectScope(exp.scope || 'Hogar');
+      switchTab('agregar');
+    }
+
+    function deleteExpense(id) {
+      if (!confirm('¿Eliminar este gasto?')) return;
+      const data = ensureMonth(monthPicker.value);
+      data.expenses = data.expenses.filter((e) => e.id !== id);
+      saveDB();
+      renderAll();
+    }
+
+    function renderList(expenses) {
+      const fOwner = document.getElementById('filterOwner').value;
+      const fPay = document.getElementById('filterPay').value;
+      const fScope = document.getElementById('filterScope').value;
+
+      const filtered = (expenses || []).filter((e) => {
+        if (fOwner === 'SHARED' && (e.split === '100_luis' || e.split === '100_wife')) return false;
+        if (fOwner === 'LUIS' && e.split !== '100_luis') return false;
+        if (fOwner === 'WIFE' && e.split !== '100_wife') return false;
+        if (fPay !== 'ALL' && (e.pay || 'Transferencia') !== fPay) return false;
+        if (fScope !== 'ALL' && (e.scope || 'Hogar') !== fScope) return false;
+        return true;
+      });
+
+      document.getElementById('countItems').textContent = filtered.length;
+      const listEl = document.getElementById('expenseList');
+      if (!filtered.length) {
+        listEl.innerHTML = '<p style="color:var(--muted); font-size:0.85rem; text-align:center; padding:18px 0;">No hay movimientos con los filtros seleccionados.</p>';
+        return;
+      }
+
+      listEl.innerHTML = filtered.map((exp) => {
+        const pctL = getLuisPct(exp);
+        const amtL = exp.amount * (pctL / 100);
+        const amtW = exp.amount - amtL;
+
+        let ownerBadge = `<span class="badge b-shared">Compartido ${pctL}/${100 - pctL}</span>`;
+        if (pctL === 100) ownerBadge = `<span class="badge b-luis">100% Luis</span>`;
+        if (pctL === 0) ownerBadge = `<span class="badge b-wife">100% Esposa</span>`;
+
+        const payClass = exp.pay === 'Tarjeta de Crédito' ? 'b-tc' : 'b-pay';
+        const scopeBadge = exp.scope === 'Personal' ? `<span class="badge b-pers">Personal</span>` : '';
+
+        return `
+          <div class="expense-item">
+            <div>
+              <div class="expense-title">${exp.desc}</div>
+              <div class="expense-meta">
+                ${ownerBadge}
+                <span class="badge ${payClass}">${exp.pay || 'Transferencia'}</span>
+                <span class="badge b-pay">${exp.cat}</span>
+                ${scopeBadge}
+              </div>
+            </div>
+            <div class="expense-right">
+              <div class="expense-amount">${fmt(exp.amount)}</div>
+              <div class="expense-split">L: ${fmt(amtL)} | E: ${fmt(amtW)}</div>
+              <div class="expense-actions">
+                <button class="icon-btn edit-exp-btn" data-id="${exp.id}" type="button">✏️</button>
+                <button class="icon-btn del-exp-btn" data-id="${exp.id}" type="button">🗑️</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAll() {
+      try {
+        const data = ensureMonth(monthPicker.value);
+        document.getElementById('incLuis').value = data.incLuis;
+        document.getElementById('incWife').value = data.incWife;
+        document.getElementById('targetPocket').value = data.targetPocket;
+
+        const totalInc = (Number(data.incLuis) || 0) + (Number(data.incWife) || 0);
+        const shareLuis = totalInc > 0 ? (Number(data.incLuis) || 0) / totalInc : 0.5;
+        const shareWife = 1 - shareLuis;
+        document.getElementById('ratioIngresoLabel').textContent =
+          `Peso ingresos: ${Math.round(shareLuis * 100)}% Luis / ${Math.round(shareWife * 100)}% Esposa`;
+
+        let totHogar = 0, totPersLuis = 0, totPersWife = 0, luisHogar = 0, wifeHogar = 0;
+        const payStats = {
+          'Transferencia': { total: 0, luis: 0, wife: 0 },
+          'Débito': { total: 0, luis: 0, wife: 0 },
+          'Tarjeta de Crédito': { total: 0, luis: 0, wife: 0 }
+        };
+
+        (data.expenses || []).forEach((exp) => {
+          const pctL = getLuisPct(exp) / 100;
+          const amtL = Number(exp.amount) * pctL;
+          const amtW = Number(exp.amount) - amtL;
+
+          if (exp.scope === 'Personal') { totPersLuis += amtL; totPersWife += amtW; }
+          else { totHogar += Number(exp.amount); luisHogar += amtL; wifeHogar += amtW; }
+
+          const pKey = payStats[exp.pay] ? exp.pay : 'Transferencia';
+          payStats[pKey].total += Number(exp.amount);
+          payStats[pKey].luis += amtL;
+          payStats[pKey].wife += amtW;
+        });
+
+        const libreLuis = (Number(data.incLuis) || 0) - (luisHogar + totPersLuis);
+        const libreWife = (Number(data.incWife) || 0) - (wifeHogar + totPersWife);
+        const justoLuis = totHogar * shareLuis;
+        const justoWife = totHogar * shareWife;
+        const diffLuis = luisHogar - justoLuis;
+
+        document.getElementById('totHogar').textContent = fmt(totHogar);
+        document.getElementById('subGastosPers').textContent = `Pers. L: ${fmt(totPersLuis)} | E: ${fmt(totPersWife)}`;
+
+        const luisLibreEl = document.getElementById('luisLibreHoy');
+        luisLibreEl.textContent = fmt(libreLuis);
+        luisLibreEl.className = `stat-val ${libreLuis < (Number(data.targetPocket) || 0) ? 'text-red' : 'text-green'}`;
+        document.getElementById('wifeLibreHoy').textContent = `Esposa libre: ${fmt(libreWife)}`;
+
+        document.getElementById('aporteRealLuis').textContent = fmt(luisHogar);
+        document.getElementById('aporteRealWife').textContent = `Ella aporta hogar: ${fmt(wifeHogar)}`;
+        document.getElementById('aporteJustoLuis').textContent = fmt(justoLuis);
+        document.getElementById('aporteJustoWife').textContent = `Ella debería: ${fmt(justoWife)}`;
+
+        const consejoBox = document.getElementById('consejoBox');
+        if (totHogar === 0) {
+          consejoBox.className = 'alert-box alert-info';
+          consejoBox.innerHTML = 'Agrega los gastos del mes (o usa <strong>Plantilla base</strong> arriba) para calcular el reparto óptimo y cuánto dinero queda en tu bolsillo.';
+        } else if (diffLuis > 15000) {
+          consejoBox.className = 'alert-box alert-warn';
+          consejoBox.innerHTML = `<strong>Desbalance detectado:</strong> Estás aportando <strong>${fmt(diffLuis)}</strong> por encima de tu proporción justa (${Math.round(shareLuis * 100)}%). Aporte sugerido: <strong>${fmt(justoLuis)}</strong>.`;
+        } else {
+          consejoBox.className = 'alert-box alert-ok';
+          consejoBox.innerHTML = `<strong>¡Finanzas equilibradas!</strong> Tu aporte al hogar (${fmt(luisHogar)}) respeta la proporción de ingresos y mantienes <strong>${fmt(libreLuis)}</strong> libres en tu bolsillo.`;
+        }
+
+        document.getElementById('payTransf').textContent = fmt(payStats['Transferencia'].total);
+        document.getElementById('payTransfSub').textContent = `L: ${fmt(payStats['Transferencia'].luis)} | E: ${fmt(payStats['Transferencia'].wife)}`;
+        document.getElementById('payDebito').textContent = fmt(payStats['Débito'].total);
+        document.getElementById('payDebitoSub').textContent = `L: ${fmt(payStats['Débito'].luis)} | E: ${fmt(payStats['Débito'].wife)}`;
+        document.getElementById('payTC').textContent = fmt(payStats['Tarjeta de Crédito'].total);
+        document.getElementById('payTCSub').textContent = `L: ${fmt(payStats['Tarjeta de Crédito'].luis)} | E: ${fmt(payStats['Tarjeta de Crédito'].wife)}`;
+
+        const tcAlert = document.getElementById('tcAlertBox');
+        if (payStats['Tarjeta de Crédito'].total > 0) {
+          tcAlert.classList.remove('hidden');
+          tcAlert.innerHTML = `<strong>Ojo con Tarjeta de Crédito:</strong> Hay <strong>${fmt(payStats['Tarjeta de Crédito'].total)}</strong> pagados con crédito este mes.`;
+        } else {
+          tcAlert.classList.add('hidden');
+        }
+
+        renderList(data.expenses || []);
+      } catch (_) {}
+    }
+
+    document.addEventListener('click', (e) => {
+      const target = e.target;
+      const tabBtn = target.closest ? target.closest('#bottomTabs .tab-btn') : null;
+      if (tabBtn && tabBtn.dataset.tab) {
+        switchTab(tabBtn.dataset.tab);
+        return;
+      }
+      const splitChip = target.closest ? target.closest('#splitTypeChips .chip') : null;
+      if (splitChip && splitChip.dataset.val) { selectSplitType(splitChip.dataset.val); return; }
+
+      const payChip = target.closest ? target.closest('#payMethodChips .chip') : null;
+      if (payChip && payChip.dataset.val) { selectPayMethod(payChip.dataset.val); return; }
+
+      const scopeChip = target.closest ? target.closest('#scopeChips .chip') : null;
+      if (scopeChip && scopeChip.dataset.val) { selectScope(scopeChip.dataset.val); return; }
+
+      const editBtn = target.closest ? target.closest('.edit-exp-btn') : null;
+      if (editBtn && editBtn.dataset.id) { editExpense(editBtn.dataset.id); return; }
+
+      const delBtn = target.closest ? target.closest('.del-exp-btn') : null;
+      if (delBtn && delBtn.dataset.id) { deleteExpense(delBtn.dataset.id); }
+    });
+
+    monthPicker.addEventListener('change', () => { resetForm(); ensureMonth(monthPicker.value); renderAll(); });
+    ['incLuis', 'incWife', 'targetPocket'].forEach((id) => {
+      document.getElementById(id).addEventListener('change', () => {
+        const d = ensureMonth(monthPicker.value);
+        d.incLuis = Number(document.getElementById('incLuis').value) || 0;
+        d.incWife = Number(document.getElementById('incWife').value) || 0;
+        d.targetPocket = Number(document.getElementById('targetPocket').value) || 0;
+        saveDB();
+        renderAll();
+      });
+    });
+
+    document.getElementById('customLuisPct').addEventListener('input', updateCustomPctLabel);
+    document.getElementById('saveExpBtn').addEventListener('click', saveExpense);
+    document.getElementById('cancelEditBtn').addEventListener('click', resetForm);
+
+    document.getElementById('copyPrevBtn').addEventListener('click', () => {
+      const [y, mo] = monthPicker.value.split('-').map(Number);
+      const prevDate = new Date(y, mo - 2, 1);
+      const prevKey = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`;
+      if (!db[prevKey] || !db[prevKey].expenses.length) {
+        alert(`No hay datos guardados en el mes anterior (${prevKey}).`);
+        return;
+      }
+      const cur = ensureMonth(monthPicker.value);
+      cur.incLuis = db[prevKey].incLuis;
+      cur.incWife = db[prevKey].incWife;
+      cur.targetPocket = db[prevKey].targetPocket;
+      cur.expenses = db[prevKey].expenses.map((e, i) => ({ ...e, id: (Date.now() + i).toString() }));
+      saveDB();
+      renderAll();
+    });
+
+    document.getElementById('templateBtn').addEventListener('click', () => {
+      if (!confirm('¿Cargar plantilla ejemplo con los gastos base del hogar?')) return;
+      const cur = ensureMonth(monthPicker.value);
+      cur.expenses = [
+        { id: '1', desc: 'Arriendo + Gastos Comunes + Servicios', amount: 1150000, cat: 'Vivienda y Servicios', split: '50_50', luisPct: 50, pay: 'Transferencia', scope: 'Hogar' },
+        { id: '2', desc: 'Mensualidad Colegio Niña', amount: 450000, cat: 'Colegio Niña', split: '50_50', luisPct: 50, pay: 'Transferencia', scope: 'Hogar' },
+        { id: '3', desc: 'Supermercado y Comida del Mes', amount: 550000, cat: 'Supermercado y Comida', split: '50_50', luisPct: 50, pay: 'Débito', scope: 'Hogar' },
+        { id: '4', desc: 'Bencina y TAG mensual', amount: 350000, cat: 'Auto (Bencina/TAG/Mant.)', split: '70_30', luisPct: 70, pay: 'Débito', scope: 'Hogar' },
+        { id: '5', desc: 'Consulta Médico / Medicamentos', amount: 75000, cat: 'Salud y Farmacia', split: '100_wife', luisPct: 0, pay: 'Tarjeta de Crédito', scope: 'Hogar' },
+        { id: '6', desc: 'Salidas a comer en familia', amount: 90000, cat: 'Salidas y Restaurantes', split: '100_wife', luisPct: 0, pay: 'Tarjeta de Crédito', scope: 'Hogar' },
+        { id: '7', desc: 'Cambio de aceite y filtro auto', amount: 65000, cat: 'Auto (Bencina/TAG/Mant.)', split: '100_luis', luisPct: 100, pay: 'Débito', scope: 'Hogar' }
+      ];
+      saveDB();
+      renderAll();
+    });
+
+    ['filterOwner', 'filterPay', 'filterScope'].forEach((id) => {
+      document.getElementById(id).addEventListener('change', renderAll);
+    });
+
+    document.getElementById('waBtn').addEventListener('click', () => {
+      const data = ensureMonth(monthPicker.value);
+      let totHogar = 0, luisHogar = 0, wifeHogar = 0, tcTotal = 0;
+      (data.expenses || []).forEach((e) => {
+        const l = e.amount * (getLuisPct(e) / 100);
+        if (e.scope !== 'Personal') { totHogar += e.amount; luisHogar += l; wifeHogar += (e.amount - l); }
+        if (e.pay === 'Tarjeta de Crédito') tcTotal += e.amount;
+      });
+      const text = `📊 *Resumen Finanzas Hogar (${monthPicker.value})*\n• Gasto Total Hogar: ${fmt(totHogar)}\n• Aporte Luis: ${fmt(luisHogar)}\n• Aporte Esposa: ${fmt(wifeHogar)}\n• Pagado con Tarjeta Crédito: ${fmt(tcTotal)}`;
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => alert('Resumen copiado para WhatsApp.'));
+    });
+
+    document.getElementById('csvBtn').addEventListener('click', () => {
+      const data = ensureMonth(monthPicker.value);
+      const rows = [['Mes', 'Concepto', 'Categoria', 'Alcance', 'Reparto', 'Metodo_Pago', 'Total', 'Luis', 'Esposa']];
+      (data.expenses || []).forEach((e) => {
+        const pctL = getLuisPct(e);
+        const l = Math.round(e.amount * (pctL / 100));
+        rows.push([monthPicker.value, `"${e.desc}"`, `"${e.cat}"`, e.scope, `${pctL}/${100 - pctL}`, `"${e.pay}"`, e.amount, l, e.amount - l]);
+      });
+      const blob = new Blob([rows.map((r) => r.join(';')).join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `finanzas_hogar_${monthPicker.value}.csv`;
+      a.click();
+    });
+
+    document.getElementById('exportJsonBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `respaldo_finanzas_hogar.json`;
+      a.click();
+    });
+
+    document.getElementById('importJsonBtn').addEventListener('click', () => document.getElementById('importJsonInput').click());
+    document.getElementById('importJsonInput').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try { db = JSON.parse(e.target.result); saveDB(); renderAll(); alert('Respaldo restaurado.'); }
+        catch (_) { alert('Archivo JSON inválido.'); }
+      };
+      reader.readAsText(file);
+    });
+
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'inline-block';
+    });
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; installBtn.style.display = 'none';
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    }
+
+    switchTab('resumen');
+    renderAll();
+  })();
+</script>
+</body>
+</html>
