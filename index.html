@@ -39,13 +39,12 @@
     nav button{flex:1;border:0;background:transparent;color:var(--muted);display:grid;justify-items:center;gap:3px;font-size:11px;font-weight:800;padding:5px 0;min-width:0}
     nav button span:first-child{font-size:21px}nav button[aria-current="page"]{color:var(--blue)}.goalbox{border:1px solid var(--border);border-radius:12px;background:#f8fafc;padding:12px;margin-bottom:10px}
     .goalbox .bartrack{height:10px}.goalhead{display:flex;justify-content:space-between;gap:8px}.goalhead strong{overflow-wrap:anywhere}.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:#0f172a;color:white;padding:11px 15px;border-radius:10px;box-shadow:0 6px 24px #0004;z-index:60;max-width:90%;min-width:210px;text-align:center}
-
     @media(max-width:400px){.grid3{grid-template-columns:1fr}.monthbar{align-items:stretch}.monthbar input{flex:1}.quick{flex:1}.quick button{flex:1}.item{flex-direction:column}.item .right{text-align:left}.actions{justify-content:flex-start}}
   </style>
 </head>
 <body>
 <header>
-  <div class="head"><div><h1>🏡 Finanzas del Hogar</h1><small>Ingresos, gastos y metas de Luis y su esposa</small></div><button id="installBtn" class="topbtn install" type="button">+ Instalar</button></div>
+  <div class="head"><div><h1>🏡 Finanzas del Hogar</h1><small>Versión 10 · Recuperación de registros anteriores</small></div><button id="installBtn" class="topbtn install" type="button">+ Instalar</button></div>
   <div class="monthbar"><input type="month" id="monthPicker" aria-label="Seleccionar mes"><div class="quick"><button class="topbtn" id="copyPrevBtn" type="button">Copiar mes anterior</button><button class="topbtn" id="templateBtn" type="button">Plantilla base</button></div></div>
 </header>
 <main>
@@ -62,13 +61,14 @@
       <div class="field"><label>¿A quién corresponde este gasto?</label><div class="chipgroup" id="scopeChips"><button type="button" class="chip" data-val="Hogar" aria-pressed="true">Hogar / Familia</button><button type="button" class="chip" data-val="Personal" aria-pressed="false">Personal</button></div></div>
       <div class="field"><label>¿Quién asume el costo? (reparto acordado)</label><div class="chipgroup" id="splitTypeChips"><button type="button" class="chip" data-val="50_50" aria-pressed="true">50 / 50</button><button type="button" class="chip" data-val="70_30" aria-pressed="false">70% Luis / 30% ella</button><button type="button" class="chip" data-val="100_luis" aria-pressed="false">100% Luis</button><button type="button" class="chip" data-val="100_wife" aria-pressed="false">100% esposa</button><button type="button" class="chip" data-val="custom" aria-pressed="false">Personalizado</button></div></div>
       <div class="field" id="customSplitBox" hidden><label for="customLuisPct">Luis: <strong id="customPctLabel">50%</strong> / Esposa: <strong id="customWifePctLabel">50%</strong></label><input type="range" id="customLuisPct" min="0" max="100" step="1" value="50" style="width:100%"></div>
-      <div class="grid2"><div class="field"><label for="paidBy">¿Quién pagó realmente?</label><select id="paidBy"><option value="LUIS">Luis</option><option value="WIFE">Esposa</option></select></div><div class="field"><label for="payMethod">Método de pago</label><select id="payMethod"><option>Transferencia</option><option>Débito</option><option>Tarjeta de Crédito</option></select></div></div>
+      <div class="grid2"><div class="field"><label for="paidBy">¿Quién pagó realmente?</label><select id="paidBy"><option value="LUIS">Luis</option><option value="WIFE">Esposa</option><option value="UNKNOWN">Por identificar (gasto recuperado)</option></select></div><div class="field"><label for="payMethod">Método de pago</label><select id="payMethod"><option>Transferencia</option><option>Débito</option><option>Tarjeta de Crédito</option></select></div></div>
       <button class="primary full" id="saveExpBtn" type="button">Guardar gasto</button>
     </div>
   </section>
 
   <section id="sec-lista" class="section" hidden><div class="panel"><div class="cardhead"><h2>Movimientos (<span id="countItems">0</span>)</h2><div class="quick"><button class="secondary" id="waBtn" type="button">WhatsApp</button><button class="secondary" id="csvBtn" type="button">CSV</button></div></div>
     <div class="grid3"><select id="filterOwner" aria-label="Filtrar responsable"><option value="ALL">Responsables: todos</option><option value="SHARED">Compartidos</option><option value="LUIS">100% Luis</option><option value="WIFE">100% esposa</option></select><select id="filterPay" aria-label="Filtrar método"><option value="ALL">Todos los pagos</option><option>Transferencia</option><option>Débito</option><option>Tarjeta de Crédito</option></select><select id="filterScope" aria-label="Filtrar alcance"><option value="ALL">Hogar y personal</option><option>Hogar</option><option>Personal</option></select></div>
+    <div class="notice" id="legacyNotice">¿Tenías gastos en una versión anterior? Puedes buscarlos sin borrar ningún dato.<div style="margin-top:8px"><button class="secondary" id="recoverLegacyBtn" type="button">Buscar y recuperar gastos anteriores</button></div></div>
     <div id="expenseList"></div><div class="quick" style="margin-top:15px"><button class="secondary" id="exportJsonBtn" type="button">Respaldar JSON</button><button class="secondary" id="importJsonBtn" type="button">Restaurar JSON</button><input id="importJsonInput" type="file" accept=".json,application/json" hidden></div><div class="hint">Tus datos se guardan en este navegador y dispositivo. Exporta el respaldo periódicamente. No se sincronizan automáticamente con el teléfono de tu esposa.</div>
   </div></section>
 
@@ -85,6 +85,7 @@
 (() => {
   'use strict';
   const KEY = 'finanzas_hogar_v9';
+  const LEGACY_KEY = 'finanzas_hogar_pwa_v1';
   const $ = id => document.getElementById(id);
   const money = x => new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Number(x)||0);
   const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -94,18 +95,18 @@
   const todayMonth = () => {const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
   const previousMonth = m => {const [y,mo]=m.split('-').map(Number);return new Date(y,mo-2,1).getFullYear()+'-'+String(new Date(y,mo-2,1).getMonth()+1).padStart(2,'0')};
   const emptyMonth = () => ({incomeLuis:0,incomeWife:0,targetPocket:0,expenses:[]});
-  let db = {version:9,months:{},goals:[]}, currentMonth=todayMonth(), editId=null, splitType='50_50', scope='Hogar', toastTimer;
+  let db = {version:10,months:{},goals:[],migrations:[]}, currentMonth=todayMonth(), editId=null, splitType='50_50', scope='Hogar', toastTimer;
 
   function toast(message){const el=$('toast');el.textContent=message;el.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.hidden=true,3500)}
   function normalizeExpense(e){
     if(!e || typeof e!=='object')return null;
     const amount=nat(e.amount), rawPct=Number(e.luisPct ?? 50), pct=Number.isFinite(rawPct)?Math.max(0,Math.min(100,rawPct)):50;
     if(!amount || !String(e.desc??'').trim())return null;
-    return {id:String(e.id||uid()),desc:String(e.desc).slice(0,120),amount,cat:String(e.cat||'Personal / Otros'),scope:e.scope==='Personal'?'Personal':'Hogar',luisPct:pct,paidBy:e.paidBy==='WIFE'?'WIFE':'LUIS',payMethod:['Transferencia','Débito','Tarjeta de Crédito'].includes(e.payMethod)?e.payMethod:'Transferencia',createdAt:String(e.createdAt||new Date().toISOString())};
+    return {id:String(e.id||uid()),desc:String(e.desc).slice(0,120),amount,cat:String(e.cat||'Personal / Otros'),scope:e.scope==='Personal'?'Personal':'Hogar',luisPct:pct,paidBy:['LUIS','WIFE','UNKNOWN'].includes(e.paidBy)?e.paidBy:'UNKNOWN',payMethod:['Transferencia','Débito','Tarjeta de Crédito'].includes(e.payMethod)?e.payMethod:'Transferencia',createdAt:String(e.createdAt||new Date().toISOString())};
   }
   function normalizeDB(o){
     if(!o || typeof o!=='object' || typeof o.months!=='object' || !o.months || !Array.isArray(o.goals))throw Error('El archivo no tiene el formato de respaldo de Finanzas del Hogar.');
-    const result={version:9,months:{},goals:[]};
+    const result={version:10,months:{},goals:[],migrations:Array.isArray(o.migrations)?o.migrations.filter(s=>typeof s==='string'):[]};
     for(const [month,record] of Object.entries(o.months)){
       if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)||!record||typeof record!=='object')continue;
       result.months[month]={incomeLuis:nat(record.incomeLuis),incomeWife:nat(record.incomeWife),targetPocket:nat(record.targetPocket),expenses:Array.isArray(record.expenses)?record.expenses.map(normalizeExpense).filter(Boolean):[]};
@@ -113,7 +114,57 @@
     result.goals=o.goals.filter(g=>g && String(g.name||'').trim() && nat(g.target)>0).map(g=>({id:String(g.id||uid()),name:String(g.name).slice(0,80),target:nat(g.target),current:nat(g.current)}));
     return result;
   }
-  function load(){try{const raw=localStorage.getItem(KEY);if(raw)db=normalizeDB(JSON.parse(raw))}catch(err){console.error(err);toast('No se pudieron leer los datos guardados. Revisa tu respaldo.')}}
+  function load(){try{const raw=localStorage.getItem(KEY);if(raw)db=normalizeDB(JSON.parse(raw))}catch(err){console.error(err);toast('No se pudieron leer los datos guardados. Revisa tu respaldo.')}updateLegacyNotice()}
+  function updateLegacyNotice(){
+    try{const found=Boolean(localStorage.getItem(LEGACY_KEY));$('legacyNotice').firstChild.textContent=found
+      ?(db.migrations.includes(LEGACY_KEY)?'Los registros anteriores ya fueron importados. Conservamos intacto el respaldo original. ':'Se detectaron datos de una versión anterior en este navegador. ')
+      :'Si utilizabas otra versión, puedes comprobar si hay registros guardados en este navegador. ';
+    }catch(err){console.warn(err)}
+  }
+  function legacyPercent(e){
+    const raw=e.luisPct??e.luisPercent??e.percentLuis??e.pctLuis;
+    if(raw!==undefined && raw!==null && Number.isFinite(Number(raw)))return Math.max(0,Math.min(100,Number(raw)));
+    const type=String(e.splitType??e.split??e.responsible??'50_50');
+    return ({'50_50':50,'70_30':70,'100_luis':100,'100_wife':0}[type]??50);
+  }
+  function recoverLegacy(){
+    let raw,old;
+    try{raw=localStorage.getItem(LEGACY_KEY);if(!raw){toast('No se encontraron registros antiguos en este navegador.');return}old=JSON.parse(raw)}
+    catch(err){alert('No se pudo leer el almacenamiento anterior. No se modificó nada.');return}
+    if(!old||typeof old!=='object'||Array.isArray(old)){alert('Se encontró información anterior, pero su formato no es compatible. No se modificó.');return}
+    const rows=Object.entries(old).filter(([m,v])=>/^\d{4}-(0[1-9]|1[0-2])$/.test(m)&&v&&typeof v==='object');
+    if(!rows.length){alert('No se encontraron meses con el formato antiguo esperado. Los datos originales siguen intactos.');return}
+    // Se descarga el JSON antiguo íntegro ANTES de realizar cualquier cambio; nunca se borra la clave original.
+    download('respaldo-original-finanzas-'+todayMonth()+'.json','application/json;charset=utf-8',raw);
+    if(db.migrations.includes(LEGACY_KEY)){toast('Estos datos ya se importaron. Se descargó otra copia del respaldo original.');return}
+    const count=rows.reduce((n,[,v])=>n+(Array.isArray(v.expenses)?v.expenses.length:0),0);
+    if(!confirm('Se encontraron '+rows.length+' meses y '+count+' movimientos anteriores. Ya iniciamos la descarga de un respaldo original. ¿Importarlos sin borrar los datos actuales?'))return;
+    let added=0,skipped=0;
+    for(const [month,legacy] of rows){
+      const target=db.months[month]||(db.months[month]=emptyMonth());
+      if(!target.incomeLuis)target.incomeLuis=nat(legacy.incLuis??legacy.incomeLuis);
+      if(!target.incomeWife)target.incomeWife=nat(legacy.incWife??legacy.incomeWife);
+      if(!target.targetPocket)target.targetPocket=nat(legacy.targetPocket);
+      const signatures=new Set(target.expenses.map(e=>[e.desc.toLowerCase(),e.amount,e.cat,e.luisPct].join('|')));
+      for(const entry of Array.isArray(legacy.expenses)?legacy.expenses:[]){
+        if(!entry||typeof entry!=='object'){skipped++;continue}
+        const converted=normalizeExpense({
+          id:'recuperado-'+uid(),desc:entry.desc??entry.description??entry.descripcion??entry.concepto??entry.name,
+          amount:entry.amount??entry.monto??entry.valor,cat:entry.cat??entry.category??entry.categoria??'Personal / Otros',
+          scope:entry.scope??entry.alcance,luisPct:legacyPercent(entry),paidBy:['LUIS','WIFE'].includes(entry.paidBy)?entry.paidBy:'UNKNOWN',
+          payMethod:entry.payMethod??entry.paymentMethod??entry.metodoPago,createdAt:entry.createdAt??entry.date
+        });
+        if(!converted){skipped++;continue}
+        const signature=[converted.desc.toLowerCase(),converted.amount,converted.cat,converted.luisPct].join('|');
+        if(signatures.has(signature)){skipped++;continue}
+        target.expenses.push(converted);signatures.add(signature);added++;
+      }
+    }
+    db.migrations.push(LEGACY_KEY);
+    if(!save())return;
+    fillMonth();updateLegacyNotice();showTab('lista');
+    alert('Recuperación terminada. Se incorporaron '+added+' movimientos ('+skipped+' omitidos por duplicados o datos incompletos). Los originales siguen guardados. Revisa quién pagó cada gasto recuperado antes de confiar en las compensaciones.');
+  }
   function save(){try{localStorage.setItem(KEY,JSON.stringify(db));return true}catch(err){console.error(err);alert('No fue posible guardar en este dispositivo. Exporta un respaldo y revisa el almacenamiento del navegador.');return false}}
   function monthData(){return db.months[currentMonth]||(db.months[currentMonth]=emptyMonth())}
   function splitPct(){return splitType==='50_50'?50:splitType==='70_30'?70:splitType==='100_luis'?100:splitType==='100_wife'?0:Number(val('customLuisPct'))}
@@ -122,10 +173,10 @@
   function chooseScope(type){scope=type;chooseChip('scopeChips',type);if(type==='Personal' && !['100_luis','100_wife'].includes(splitType))chooseSplit(val('paidBy')==='WIFE'?'100_wife':'100_luis')}
   function showTab(name){document.querySelectorAll('.section').forEach(s=>s.hidden=s.id!=='sec-'+name);document.querySelectorAll('nav [data-tab]').forEach(b=>{if(b.dataset.tab===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});window.scrollTo({top:0,behavior:'instant'})}
   window.irPestana=showTab; // Compatibilidad con enlaces de versiones anteriores.
-
   function resetForm(){editId=null;$('formTitle').textContent='Registrar nuevo gasto';$('saveExpBtn').textContent='Guardar gasto';$('cancelEditBtn').hidden=true;$('expDesc').value='';$('expAmount').value='';$('expCat').selectedIndex=0;$('paidBy').value='LUIS';$('payMethod').value='Transferencia';$('customLuisPct').value='50';chooseSplit('50_50');chooseScope('Hogar');updateCustom()}
   function updateCustom(){$('customPctLabel').textContent=val('customLuisPct')+'%';$('customWifePctLabel').textContent=(100-Number(val('customLuisPct')))+'%'}
   function saveExpense(){const desc=val('expDesc').trim(),amount=Number(val('expAmount'));if(!desc){toast('Escribe la descripción del gasto.');$('expDesc').focus();return}if(!Number.isSafeInteger(amount)||amount<=0){toast('Ingresa un monto válido y mayor que cero.');$('expAmount').focus();return}
+    if(val('paidBy')==='UNKNOWN'){toast('Identifica quién pagó antes de guardar este movimiento.');$('paidBy').focus();return}
     const pct=splitPct();if(scope==='Personal' && pct!==0 && pct!==100){toast('Un gasto personal debe corresponder 100% a una persona.');return}
     const old=monthData().expenses.find(x=>x.id===editId);
     const e={id:editId||uid(),desc,amount,cat:val('expCat'),scope,luisPct:pct,paidBy:val('paidBy'),payMethod:val('payMethod'),createdAt:old?.createdAt||new Date().toISOString()};
@@ -136,28 +187,28 @@
   }
   function deleteExpense(id){const e=monthData().expenses.find(x=>x.id===id);if(!e||!confirm('¿Eliminar el gasto «'+e.desc+'» de '+money(e.amount)+'?'))return;monthData().expenses=monthData().expenses.filter(x=>x.id!==id);if(editId===id)resetForm();save();render();toast('Gasto eliminado.')}
   function totals(){const m=monthData(),expenses=m.expenses,home=expenses.filter(e=>e.scope==='Hogar'),personal=expenses.filter(e=>e.scope==='Personal');const sum=a=>a.reduce((s,e)=>s+e.amount,0);
-    const paidLuis=expenses.filter(e=>e.paidBy==='LUIS').reduce((s,e)=>s+e.amount,0),paidWife=sum(expenses)-paidLuis;
-    const paidHomeLuis=home.filter(e=>e.paidBy==='LUIS').reduce((s,e)=>s+e.amount,0),paidHomeWife=sum(home)-paidHomeLuis;
+    const paidLuis=expenses.filter(e=>e.paidBy==='LUIS').reduce((s,e)=>s+e.amount,0),paidWife=expenses.filter(e=>e.paidBy==='WIFE').reduce((s,e)=>s+e.amount,0);
+    const paidHomeLuis=home.filter(e=>e.paidBy==='LUIS').reduce((s,e)=>s+e.amount,0),paidHomeWife=home.filter(e=>e.paidBy==='WIFE').reduce((s,e)=>s+e.amount,0);
     const dueLuis=expenses.reduce((s,e)=>s+Math.round(e.amount*e.luisPct/100),0);const dueWife=sum(expenses)-dueLuis;
     const personalLuis=personal.reduce((s,e)=>s+Math.round(e.amount*e.luisPct/100),0);
-    return {m,expenses,home,personal,total:sum(expenses),homeTotal:sum(home),personalTotal:sum(personal),paidLuis,paidWife,paidHomeLuis,paidHomeWife,dueLuis,dueWife,personalLuis,personalWife:sum(personal)-personalLuis,freeLuis:m.incomeLuis-paidLuis,freeWife:m.incomeWife-paidWife};
+    const unknown=expenses.filter(e=>e.paidBy==='UNKNOWN');
+    return {m,expenses,home,personal,unknown,total:sum(expenses),homeTotal:sum(home),personalTotal:sum(personal),paidLuis,paidWife,paidHomeLuis,paidHomeWife,dueLuis,dueWife,personalLuis,personalWife:sum(personal)-personalLuis,freeLuis:m.incomeLuis-paidLuis,freeWife:m.incomeWife-paidWife};
   }
   function setText(id,text){$(id).textContent=text}
   function renderBalance(t){const allInc=t.m.incomeLuis+t.m.incomeWife,lratio=allInc?t.m.incomeLuis/allInc:0,ratioText=allInc?`${Math.round(lratio*100)}% Luis / ${Math.round((1-lratio)*100)}% esposa`:'Falta registrar ingresos';
     setText('ratioIngresoLabel','Proporción de ingresos: '+ratioText);setText('totHogar',money(t.homeTotal));setText('subGastosPers','Personales: '+money(t.personalTotal));setText('luisLibreHoy',money(t.freeLuis));setText('wifeLibreHoy','Esposa: '+money(t.freeWife));setText('aporteRealLuis',money(t.paidHomeLuis));setText('aporteRealWife','Esposa: '+money(t.paidHomeWife));
     const propLuis=Math.round(t.homeTotal*lratio);setText('aporteJustoLuis',money(propLuis));setText('aporteJustoWife','Esposa: '+money(t.homeTotal-propLuis));
     const balance=t.paidLuis-t.dueLuis;const abs=money(Math.abs(balance));let advice=t.total===0?'Registra los primeros gastos para calcular cuánto aportó cada uno.':balance>0?'Según el reparto acordado, tu esposa debería compensarte '+abs+'.':balance<0?'Según el reparto acordado, deberías compensar a tu esposa '+abs+'.':'Según el reparto acordado, ambos están al día: no hay compensaciones pendientes.';
+    if(t.unknown.length)advice='Hay '+t.unknown.length+' gastos recuperados cuyo pagador aún debes identificar. Los saldos y las compensaciones no son definitivos hasta que revises esos movimientos.';
     if(allInc===0 && t.homeTotal)advice+=' Ingresa los sueldos para ver la referencia proporcional.';
-
-                            
- if(t.freeLuis<t.m.targetPocket)advice+=' Tu saldo estimado está '+money(t.m.targetPocket-t.freeLuis)+' por debajo del mínimo que quieres conservar.';
+    if(t.freeLuis<t.m.targetPocket)advice+=' Tu saldo estimado está '+money(t.m.targetPocket-t.freeLuis)+' por debajo del mínimo que quieres conservar.';
     setText('consejoBox',advice);
-    for(const [method,id,sub] of [['Transferencia','payTransf','payTransfSub'],['Débito','payDebito','payDebitoSub'],['Tarjeta de Crédito','payTC','payTCSub']]){const subset=t.expenses.filter(e=>e.payMethod===method);setText(id,money(subset.reduce((s,e)=>s+e.amount,0)));setText(sub,`L: ${money(subset.filter(e=>e.paidBy==='LUIS').reduce((s,e)=>s+e.amount,0))} · E: ${money(subset.filter(e=>e.paidBy==='WIFE').reduce((s,e)=>s+e.amount,0))}`)}
+    for(const [method,id,sub] of [['Transferencia','payTransf','payTransfSub'],['Débito','payDebito','payDebitoSub'],['Tarjeta de Crédito','payTC','payTCSub']]){const subset=t.expenses.filter(e=>e.payMethod===method);setText(id,money(subset.reduce((s,e)=>s+e.amount,0)));const unknown=subset.filter(e=>e.paidBy==='UNKNOWN').reduce((s,e)=>s+e.amount,0);setText(sub,`L: ${money(subset.filter(e=>e.paidBy==='LUIS').reduce((s,e)=>s+e.amount,0))} · E: ${money(subset.filter(e=>e.paidBy==='WIFE').reduce((s,e)=>s+e.amount,0))}${unknown?' · ?: '+money(unknown):''}`)}
     const credit=t.expenses.filter(e=>e.payMethod==='Tarjeta de Crédito').reduce((s,e)=>s+e.amount,0);$('tcAlertBox').hidden=!credit;if(credit)setText('tcAlertBox','Compras registradas con tarjeta de crédito: '+money(credit)+'. Este monto es un compromiso; verifica aparte la fecha de pago de la tarjeta para no duplicarlo.');
     $('goalsMonthFree').textContent=money(t.freeLuis);
   }
   function renderExpenses(t){const owner=val('filterOwner'),pay=val('filterPay'),scopeFilter=val('filterScope');const visible=t.expenses.filter(e=>(owner==='ALL'||(owner==='SHARED'&&e.luisPct>0&&e.luisPct<100)||(owner==='LUIS'&&e.luisPct===100)||(owner==='WIFE'&&e.luisPct===0))&&(pay==='ALL'||e.payMethod===pay)&&(scopeFilter==='ALL'||e.scope===scopeFilter));setText('countItems',visible.length);
-    $('expenseList').innerHTML=visible.length?visible.map(e=>`<div class="item"><div><h3>${esc(e.desc)}</h3><div class="small">${esc(e.cat)}</div><div class="tags"><span class="tag ${e.scope==='Personal'?'pers':''}">${esc(e.scope)}</span><span class="tag">Luis ${e.luisPct}% / Esposa ${100-e.luisPct}%</span><span class="tag pay">${esc(e.payMethod)}</span><span class="tag">Pagó: ${e.paidBy==='LUIS'?'Luis':'Esposa'}</span></div></div><div class="right"><strong>${money(e.amount)}</strong><div class="small">Luis asume ${money(Math.round(e.amount*e.luisPct/100))}</div><div class="actions"><button class="secondary" type="button" data-action="edit" data-id="${esc(e.id)}">Editar</button><button class="secondary dangerbtn" type="button" data-action="delete" data-id="${esc(e.id)}">Eliminar</button></div></div></div>`).join(''):'<div class="empty">No hay gastos que coincidan con los filtros de este mes.</div>';
+    $('expenseList').innerHTML=visible.length?visible.map(e=>`<div class="item"><div><h3>${esc(e.desc)}</h3><div class="small">${esc(e.cat)}</div><div class="tags"><span class="tag ${e.scope==='Personal'?'pers':''}">${esc(e.scope)}</span><span class="tag">Luis ${e.luisPct}% / Esposa ${100-e.luisPct}%</span><span class="tag pay">${esc(e.payMethod)}</span><span class="tag">Pagó: ${e.paidBy==='LUIS'?'Luis':e.paidBy==='WIFE'?'Esposa':'⚠️ Por identificar'}</span></div></div><div class="right"><strong>${money(e.amount)}</strong><div class="small">Luis asume ${money(Math.round(e.amount*e.luisPct/100))}</div><div class="actions"><button class="secondary" type="button" data-action="edit" data-id="${esc(e.id)}">Editar</button><button class="secondary dangerbtn" type="button" data-action="delete" data-id="${esc(e.id)}">Eliminar</button></div></div></div>`).join(''):'<div class="empty">No hay gastos que coincidan con los filtros de este mes.</div>';
   }
   function bars(element,expenses,color){const sums={};for(const e of expenses)sums[e.cat]=(sums[e.cat]||0)+e.amount;const sorted=Object.entries(sums).sort((a,b)=>b[1]-a[1]);const max=sorted.length?sorted[0][1]:1;$(element).innerHTML=sorted.length?sorted.map(([cat,total])=>`<div class="barrow"><div class="barlabel"><span>${esc(cat)}</span><span>${money(total)}</span></div><div class="bartrack"><div class="barfill ${color}" style="width:${(total/max)*100}%"></div></div></div>`).join(''):'<div class="empty">Aún no hay gastos de este tipo.</div>'}
   function renderCharts(t){setText('chartTotGeneral',money(t.homeTotal));setText('chartPctGeneral',t.total?Math.round(100*t.homeTotal/t.total)+'% del gasto total':'Sin movimientos');setText('chartTotPersonal',money(t.personalTotal));setText('chartSubPersonal','Luis: '+money(t.personalLuis)+' · Esposa: '+money(t.personalWife));bars('chartGeneralBars',t.home,'');bars('chartPersonalBars',t.personal,'pers')}
@@ -169,13 +220,13 @@
   function download(name,type,contents){const blob=new Blob([contents],{type});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000)}
   function downloadJSON(){download('respaldo-finanzas-hogar-'+todayMonth()+'.json','application/json;charset=utf-8',JSON.stringify(db,null,2));toast('Respaldo descargado.')}
   function safeCsv(v){let s=String(v??'');if(/^[=+@-]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'}
-  function downloadCSV(){const rows=[['Mes','Descripción','Monto CLP','Categoría','Alcance','Porcentaje Luis','Paga','Método'],...monthData().expenses.map(e=>[currentMonth,e.desc,e.amount,e.cat,e.scope,e.luisPct,e.paidBy==='LUIS'?'Luis':'Esposa',e.payMethod])];download('gastos-'+currentMonth+'.csv','text/csv;charset=utf-8','\ufeff'+rows.map(r=>r.map(safeCsv).join(';')).join('\r\n'));toast('CSV descargado.')}
+  function downloadCSV(){const rows=[['Mes','Descripción','Monto CLP','Categoría','Alcance','Porcentaje Luis','Paga','Método'],...monthData().expenses.map(e=>[currentMonth,e.desc,e.amount,e.cat,e.scope,e.luisPct,e.paidBy==='LUIS'?'Luis':e.paidBy==='WIFE'?'Esposa':'Por identificar',e.payMethod])];download('gastos-'+currentMonth+'.csv','text/csv;charset=utf-8','\ufeff'+rows.map(r=>r.map(safeCsv).join(';')).join('\r\n'));toast('CSV descargado.')}
   function copyPrevious(){const from=db.months[previousMonth(currentMonth)];if(!from){toast('No hay datos del mes anterior.');return}const dest=monthData();if((dest.expenses.length||dest.incomeLuis||dest.incomeWife)&&!confirm('Este mes ya tiene datos. ¿Sobrescribirlo con una copia del mes anterior?'))return;db.months[currentMonth]={incomeLuis:from.incomeLuis,incomeWife:from.incomeWife,targetPocket:from.targetPocket,expenses:from.expenses.map(e=>({...e,id:uid(),createdAt:new Date().toISOString()}))};save();resetForm();fillMonth();toast('Mes anterior copiado. Revisa y actualiza montos.')}
   function makeTemplate(){const base=['Arriendo / dividendo','Electricidad','Agua','Internet / telefonía','Supermercado','Colegio / transporte','Bencina / TAG'];const exists=new Set(monthData().expenses.map(e=>e.desc.toLowerCase()));let added=0;for(const desc of base){if(exists.has(desc.toLowerCase()))continue;monthData().expenses.push({id:uid(),desc,amount:1,cat:desc.includes('Colegio')?'Colegio Niña':desc.includes('Supermercado')?'Supermercado y Comida':desc.includes('Bencina')?'Auto (Bencina/TAG/Mant.)':'Vivienda y Servicios',scope:'Hogar',luisPct:50,paidBy:'LUIS',payMethod:'Transferencia',createdAt:new Date().toISOString()});added++}if(!added){toast('La plantilla ya existe para este mes.');return}save();render();showTab('lista');alert('Se agregaron '+added+' gastos de ejemplo con $1 para que puedas editarlos. Actualiza cada monto y quién pagó antes de utilizar el balance.')}
-  function sendWhatsApp(){const t=totals();const lines=[`Finanzas del Hogar — ${currentMonth}`,`Ingresos: Luis ${money(t.m.incomeLuis)} / Esposa ${money(t.m.incomeWife)}`,`Gastos hogar: ${money(t.homeTotal)}`,`Gastos personales: ${money(t.personalTotal)}`,`Total: ${money(t.total)}`,...t.expenses.map(e=>`• ${e.desc}: ${money(e.amount)} (${e.scope}; pagó ${e.paidBy==='LUIS'?'Luis':'Esposa'})`)];const url='https://wa.me/?text='+encodeURIComponent(lines.join('\n'));const w=window.open(url,'_blank','noopener,noreferrer');if(!w){navigator.clipboard?.writeText(lines.join('\n')).then(()=>toast('Resumen copiado para compartir.')).catch(()=>toast('Activa ventanas emergentes para compartir.'))}}
+  function sendWhatsApp(){const t=totals();const lines=[`Finanzas del Hogar — ${currentMonth}`,`Ingresos: Luis ${money(t.m.incomeLuis)} / Esposa ${money(t.m.incomeWife)}`,`Gastos hogar: ${money(t.homeTotal)}`,`Gastos personales: ${money(t.personalTotal)}`,`Total: ${money(t.total)}`,...t.expenses.map(e=>`• ${e.desc}: ${money(e.amount)} (${e.scope}; pagó ${e.paidBy==='LUIS'?'Luis':e.paidBy==='WIFE'?'Esposa':'por identificar'})`)];const url='https://wa.me/?text='+encodeURIComponent(lines.join('\n'));const w=window.open(url,'_blank','noopener,noreferrer');if(!w){navigator.clipboard?.writeText(lines.join('\n')).then(()=>toast('Resumen copiado para compartir.')).catch(()=>toast('Activa ventanas emergentes para compartir.'))}}
   async function restoreJSON(file){if(!file)return;try{if(file.size>5*1024*1024)throw Error('El archivo es demasiado grande.');const incoming=normalizeDB(JSON.parse(await file.text()));if(!confirm('Restaurar reemplazará TODOS los datos actuales en este navegador. ¿Ya descargaste un respaldo y deseas continuar?'))return;db=incoming;save();resetForm();fillMonth();toast('Respaldo restaurado.') }catch(err){alert('No se pudo restaurar: '+err.message)}finally{$('importJsonInput').value=''}}
 
- // Enlazar todos los eventos después de que existe el contenido HTML.
+  // Enlazar todos los eventos después de que existe el contenido HTML.
   document.querySelectorAll('nav [data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
   $('monthPicker').value=currentMonth;$('monthPicker').addEventListener('change',e=>{if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(e.target.value))return;currentMonth=e.target.value;resetForm();fillMonth()});
   for(const [id,key] of [['incLuis','incomeLuis'],['incWife','incomeWife'],['targetPocket','targetPocket']])$(id).addEventListener('input',e=>{const n=Number(e.target.value);if(Number.isFinite(n)&&n>=0){monthData()[key]=nat(n);save();render()}});
@@ -187,7 +238,7 @@
   ['filterOwner','filterPay','filterScope'].forEach(id=>$(id).addEventListener('change',()=>renderExpenses(totals())));
   $('saveGoalBtn').addEventListener('click',saveGoal);$('goalsList').addEventListener('click',e=>{const b=e.target.closest('button[data-goal]');if(b)modifyGoal(b.dataset.goal,b.dataset.id)});
   $('copyPrevBtn').addEventListener('click',copyPrevious);$('templateBtn').addEventListener('click',makeTemplate);$('csvBtn').addEventListener('click',downloadCSV);$('waBtn').addEventListener('click',sendWhatsApp);
-  $('exportJsonBtn').addEventListener('click',downloadJSON);$('importJsonBtn').addEventListener('click',()=>$('importJsonInput').click());$('importJsonInput').addEventListener('change',e=>restoreJSON(e.target.files[0]));
+  $('exportJsonBtn').addEventListener('click',downloadJSON);$('importJsonBtn').addEventListener('click',()=>$('importJsonInput').click());$('importJsonInput').addEventListener('change',e=>restoreJSON(e.target.files[0]));$('recoverLegacyBtn').addEventListener('click',recoverLegacy);
   let deferredPrompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('installBtn').style.display='block'});$('installBtn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$('installBtn').style.display='none'});
   if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('SW:',err));
   load();fillMonth();showTab('resumen');
