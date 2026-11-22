@@ -1,19 +1,14 @@
-{
-  "name": "Finanzas del Hogar - Control y Equilibrio",
-  "short_name": "Finanzas Hogar",
-  "description": "Control de gastos compartidos, individuales y métodos de pago del hogar en CLP.",
-  "start_url": "./index.html",
-  "scope": "./",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
-  "icons": [
-    {
-      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%230f172a'/><path d='M256 96L104 220h44v176h216V220h44L256 96z' fill='%2310b981'/><rect x='216' y='284' width='80' height='112' rx='12' fill='%230f172a'/><circle cx='256' cy='212' r='26' fill='%230f172a'/></svg>",
-      "sizes": "192x192 512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
+  "name":"Finanzas del Hogar",
+  "short_name":"Mi Hogar",
+  "description":"Control familiar de ingresos, gastos y metas de ahorro",
+  "start_url":"./index.html",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#f1f5f9",
+  "theme_color":"#0f172a",
+  "lang":"es-CL",
+  "icons":[
+    {"src":"./icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"./icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
   ]
 }
