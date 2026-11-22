@@ -1,999 +1,197 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0f172a" />
-  <link rel="manifest" href="./manifest.json" />
-  <title>Finanzas del Hogar - PWA</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="description" content="Control de ingresos, gastos y metas de ahorro del hogar.">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <title>Finanzas del Hogar</title>
   <style>
-    :root {
-      --bg: #f1f5f9;
-      --surface: #ffffff;
-      --surface-2: #f8fafc;
-      --primary: #0f172a;
-      --accent: #059669;
-      --accent-soft: #d1fae5;
-      --blue: #2563eb;
-      --blue-soft: #dbeafe;
-      --purple: #7c3aed;
-      --purple-soft: #ede9fe;
-      --amber: #d97706;
-      --amber-soft: #fef3c7;
-      --danger: #dc2626;
-      --danger-soft: #fee2e2;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --radius: 14px;
-      --shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
-    }
+    :root{--navy:#0f172a;--green:#059669;--blue:#2563eb;--purple:#7c3aed;--red:#dc2626;--amber:#b45309;--bg:#f1f5f9;--border:#e2e8f0;--muted:#64748b}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--navy);font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;padding-bottom:100px}
+    button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+    header{position:sticky;top:0;z-index:10;background:var(--navy);color:white;padding:14px max(14px,env(safe-area-inset-right)) 12px}
+    .head,.monthbar{max-width:780px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .head h1{font-size:17px;margin:0}.head small{display:block;color:#94a3b8;font-weight:500;font-size:11px}
+    .monthbar{margin-top:12px}.monthbar input,.topbtn{background:#1e293b;color:#fff;border:1px solid #334155;border-radius:9px;padding:8px;font-weight:650}
+    .quick{display:flex;gap:6px;flex-wrap:wrap}.topbtn{font-size:11px}.install{background:var(--green);display:none}
+    main{max-width:780px;margin:0 auto;padding:14px;display:grid;gap:12px}.panel{background:white;border:1px solid var(--border);border-radius:15px;padding:15px;box-shadow:0 2px 10px #0f172a0a}
+    .panel h2{margin:0 0 12px;font-size:15px}.panel h3{margin:0 0 8px;font-size:13px}.small{font-size:12px;color:var(--muted)}.hint{color:var(--muted);font-size:12px;margin-top:6px}
+    .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    label{font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px}.field{margin-bottom:12px}
+    input[type="text"],input[type="number"],select{width:100%;border-radius:10px;border:1px solid #cbd5e1;background:#f8fafc;padding:10px;min-width:0;color:var(--navy)}
+    .stat{border:1px solid var(--border);border-radius:11px;background:#f8fafc;padding:10px;min-width:0}
+    .stat strong{font-size:clamp(13px,3.5vw,19px);display:block;overflow-wrap:anywhere}.stat label{font-size:11px}.green{color:var(--green)}.blue{color:var(--blue)}.purple{color:var(--purple)}.red{color:var(--red)}
+    .notice{padding:11px;margin-top:10px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;color:#1e40af;font-size:12px;line-height:1.55}.notice.warning{background:#fffbeb;border-color:#fcd34d;color:#92400e}
+    .chipgroup{display:flex;flex-wrap:wrap;gap:6px}.chip{border:1px solid #cbd5e1;background:#f8fafc;border-radius:10px;padding:9px;flex:1;min-width:90px;font-size:12px;font-weight:700}
+    .chip[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .primary{border:0;border-radius:10px;background:var(--green);color:#fff;padding:12px;font-weight:800}.primary.full{width:100%}.secondary{border:1px solid var(--border);background:#f8fafc;border-radius:9px;padding:8px 10px;color:var(--navy);font-weight:700;font-size:12px}.dangerbtn{color:var(--red)}
+    .section[hidden], [hidden]{display:none!important}.cardhead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}.cardhead h2{margin:0}
+    .item{border:1px solid var(--border);border-radius:12px;padding:11px;margin-top:8px;display:flex;justify-content:space-between;gap:10px}
+    .item h3{font-size:14px;margin:0 0 3px;overflow-wrap:anywhere}.item .right{text-align:right;flex-shrink:0}.item .right strong{display:block}.tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+    .tag{background:#e0f2fe;border-radius:5px;padding:2px 5px;font-size:10px;font-weight:650}.tag.pers{background:#fce7f3}.tag.pay{background:#fef3c7}
+    .actions{display:flex;gap:6px;justify-content:flex-end;margin-top:6px}.empty{color:var(--muted);text-align:center;padding:22px 8px;font-size:13px}
+    .barrow{margin:0 0 13px}.barlabel{display:flex;justify-content:space-between;gap:7px;font-weight:650;font-size:12px;margin-bottom:5px}
+    .bartrack{background:#e2e8f0;border-radius:50px;height:12px;overflow:hidden}.barfill{height:100%;background:var(--blue);border-radius:50px}.barfill.pers{background:var(--purple)}.barfill.goal{background:var(--green)}
+    nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:white;border-top:1px solid var(--border);padding:7px 2px calc(7px + env(safe-area-inset-bottom));z-index:30}
+    nav button{flex:1;border:0;background:transparent;color:var(--muted);display:grid;justify-items:center;gap:3px;font-size:11px;font-weight:800;padding:5px 0;min-width:0}
+    nav button span:first-child{font-size:21px}nav button[aria-current="page"]{color:var(--blue)}.goalbox{border:1px solid var(--border);border-radius:12px;background:#f8fafc;padding:12px;margin-bottom:10px}
+    .goalbox .bartrack{height:10px}.goalhead{display:flex;justify-content:space-between;gap:8px}.goalhead strong{overflow-wrap:anywhere}.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:#0f172a;color:white;padding:11px 15px;border-radius:10px;box-shadow:0 6px 24px #0004;z-index:60;max-width:90%;min-width:210px;text-align:center}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 98px; }
-
-    header {
-      background: var(--primary); color: #fff; padding: 15px 16px;
-      position: sticky; top: 0; z-index: 20;
-    }
-    .header-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; max-width: 780px; margin: 0 auto; }
-    header h1 { font-size: 1.05rem; font-weight: 700; }
-    .pwa-badge { font-size: 0.7rem; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; padding: 3px 8px; border-radius: 999px; font-weight: 600; }
-
-    .month-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; max-width: 780px; margin: 10px auto 0; flex-wrap: wrap; }
-    .month-bar input[type="month"] {
-      background: #1e293b; color: #fff; border: 1px solid #334155;
-      padding: 7px 10px; border-radius: 10px; font-size: 0.9rem; font-weight: 600;
-    }
-    .btn-mini {
-      background: #1e293b; color: #e2e8f0; border: 1px solid #334155;
-      padding: 7px 10px; border-radius: 10px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
-    }
-    #installBtn { background: var(--accent); color: #fff; border-color: var(--accent); display: none; }
-
-    .container { max-width: 780px; margin: 0 auto; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
-    .card {
-      background: var(--surface); border-radius: var(--radius); padding: 15px;
-      box-shadow: var(--shadow); border: 1px solid var(--border);
-    }
-    .card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-
-    label { display: block; font-size: 0.76rem; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
-    input[type="text"], input[type="number"], select {
-      width: 100%; padding: 10px 11px; border: 1px solid var(--border); border-radius: 10px;
-      font-size: 0.92rem; background: var(--surface-2); color: var(--text);
-    }
-
-    .stat-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 11px; padding: 10px; }
-    .stat-label { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
-    .stat-val { font-size: 1.05rem; font-weight: 800; margin-top: 2px; }
-    .stat-sub { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-    .text-green { color: var(--accent); }
-    .text-red { color: var(--danger); }
-    .text-blue { color: var(--blue); }
-    .text-amber { color: var(--amber); }
-
-    .alert-box { border-radius: 11px; padding: 11px 12px; font-size: 0.82rem; line-height: 1.4; margin-top: 10px; }
-    .alert-info { background: var(--blue-soft); color: #1e3a8a; border: 1px solid #bfdbfe; }
-    .alert-warn { background: var(--amber-soft); color: #78350f; border: 1px solid #fde68a; }
-    .alert-ok { background: var(--accent-soft); color: #064e3b; border: 1px solid #a7f3d0; }
-
-    .chip-group { display: flex; gap: 6px; flex-wrap: wrap; }
-    .chip {
-      flex: 1; min-width: 88px; text-align: center; padding: 9px 8px; border-radius: 10px;
-      border: 1.5px solid var(--border); background: var(--surface-2); font-size: 0.8rem;
-      font-weight: 600; cursor: pointer;
-    }
-    .chip.active { border-color: var(--primary); background: var(--primary); color: #fff; }
-    .chip.active-pay { border-color: var(--blue); background: var(--blue-soft); color: #1e40af; }
-
-    .btn-primary {
-      width: 100%; background: var(--accent); color: #fff; border: none; padding: 12px;
-      border-radius: 11px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 10px;
-    }
-    .btn-secondary {
-      background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
-      padding: 8px 11px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
-    }
-
-    .expense-item {
-      border: 1px solid var(--border); border-radius: 12px; padding: 11px;
-      display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
-      background: #fff; margin-bottom: 8px;
-    }
-    .expense-title { font-weight: 700; font-size: 0.9rem; }
-    .expense-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
-    .badge { font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
-    .b-shared { background: var(--blue-soft); color: #1e40af; }
-    .b-luis { background: var(--accent-soft); color: #065f46; }
-    .b-wife { background: var(--purple-soft); color: #5b21b6; }
-    .b-pay { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
-    .b-tc { background: var(--amber-soft); color: #92400e; }
-    .b-pers { background: #fce7f3; color: #9d174d; }
-
-    .expense-right { text-align: right; min-width: 105px; }
-    .expense-amount { font-weight: 800; font-size: 0.96rem; }
-    .expense-split { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-    .expense-actions { margin-top: 6px; display: flex; gap: 6px; justify-content: flex-end; }
-    .icon-btn {
-      background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px;
-      padding: 4px 8px; font-size: 0.75rem; cursor: pointer;
-    }
-
-    .bar-row { margin-bottom: 11px; }
-    .bar-head { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; gap: 8px; }
-    .bar-track { width: 100%; height: 11px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 999px; transition: width 0.25s ease; }
-    .bar-general { background: var(--blue); }
-    .bar-personal { background: var(--purple); }
-    .bar-goal { background: var(--accent); }
-
-    .goal-card {
-      border: 1px solid var(--border); border-radius: 12px; padding: 12px;
-      background: var(--surface-2); margin-bottom: 10px;
-    }
-    .goal-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
-    .goal-name { font-weight: 700; font-size: 0.94rem; }
-    .goal-pct { font-weight: 800; font-size: 0.86rem; color: var(--accent); }
-    .goal-nums { font-size: 0.78rem; color: var(--muted); margin-bottom: 7px; }
-    .goal-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-    .btn-goal {
-      background: #fff; border: 1px solid var(--border); border-radius: 8px;
-      padding: 6px 9px; font-size: 0.75rem; font-weight: 700; cursor: pointer; color: var(--text);
-    }
-    .btn-goal.add { background: var(--accent-soft); border-color: #a7f3d0; color: #065f46; }
-    .btn-goal.del { background: var(--danger-soft); border-color: #fecaca; color: #991b1b; }
-
-    .tabs {
-      position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
-      border-top: 1px solid var(--border); display: flex; justify-content: space-around;
-      padding: 8px 2px calc(8px + env(safe-area-inset-bottom)); z-index: 99;
-    }
-    .tab-btn {
-      flex: 1; background: none; border: none; font-size: 0.68rem; font-weight: 700;
-      color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer;
-    }
-    .tab-btn.active { color: var(--primary); }
-    .hidden { display: none !important; }
+    @media(max-width:400px){.grid3{grid-template-columns:1fr}.monthbar{align-items:stretch}.monthbar input{flex:1}.quick{flex:1}.quick button{flex:1}.item{flex-direction:column}.item .right{text-align:left}.actions{justify-content:flex-start}}
   </style>
 </head>
 <body>
-
 <header>
-  <div class="header-top">
-    <h1>Finanzas del Hogar <span class="pwa-badge" id="offlineStatus">PWA v5 + Metas</span></h1>
-    <button class="btn-mini" id="installBtn" type="button">+ Instalar App</button>
-  </div>
-  <div class="month-bar">
-    <input type="month" id="monthPicker" />
-    <div style="display:flex; gap:6px;">
-      <button class="btn-mini" id="copyPrevBtn" type="button">Copiar mes anterior</button>
-      <button class="btn-mini" id="templateBtn" type="button">Plantilla base</button>
-    </div>
-  </div>
+  <div class="head"><div><h1>🏡 Finanzas del Hogar</h1><small>Ingresos, gastos y metas de Luis y su esposa</small></div><button id="installBtn" class="topbtn install" type="button">+ Instalar</button></div>
+  <div class="monthbar"><input type="month" id="monthPicker" aria-label="Seleccionar mes"><div class="quick"><button class="topbtn" id="copyPrevBtn" type="button">Copiar mes anterior</button><button class="topbtn" id="templateBtn" type="button">Plantilla base</button></div></div>
 </header>
+<main>
+  <section id="sec-resumen" class="section">
+    <div class="panel"><h2>1. Ingresos líquidos del mes</h2><div class="grid2"><div><label for="incLuis">Ingreso de Luis ($)</label><input type="number" id="incLuis" min="0" step="1000" inputmode="numeric"></div><div><label for="incWife">Ingreso de esposa ($)</label><input type="number" id="incWife" min="0" step="1000" inputmode="numeric"></div></div><div class="field" style="margin-top:12px"><label for="targetPocket">Monto mínimo que quieres conservar libre ($)</label><input type="number" id="targetPocket" min="0" step="1000" inputmode="numeric"></div><div class="hint" id="ratioIngresoLabel">Proporción de ingresos: —</div></div>
+    <div class="panel"><h2>2. Balance del hogar</h2><div class="grid2"><div class="stat"><label>Gastos del hogar</label><strong id="totHogar">$0</strong><div class="small" id="subGastosPers">Personales: $0</div></div><div class="stat"><label>Saldo estimado de Luis</label><strong id="luisLibreHoy">$0</strong><div class="small" id="wifeLibreHoy">Esposa: $0</div></div><div class="stat"><label>Pagos realizados por Luis (hogar)</label><strong class="blue" id="aporteRealLuis">$0</strong><div class="small" id="aporteRealWife">Esposa: $0</div></div><div class="stat"><label>Reparto proporcional al ingreso (hogar)</label><strong class="green" id="aporteJustoLuis">$0</strong><div class="small" id="aporteJustoWife">Esposa: $0</div></div></div><div class="notice" id="consejoBox"></div><div class="hint">El reparto acordado se calcula gasto a gasto; el reparto proporcional al ingreso se muestra como referencia. Las compras con crédito se descuentan como compromisos, aunque todavía no se hayan pagado al banco.</div></div>
+    <div class="panel"><h2>3. Métodos de pago</h2><div class="grid3"><div class="stat"><label>Transferencia</label><strong id="payTransf">$0</strong><div class="small" id="payTransfSub"></div></div><div class="stat"><label>Débito</label><strong id="payDebito">$0</strong><div class="small" id="payDebitoSub"></div></div><div class="stat"><label>Crédito</label><strong id="payTC">$0</strong><div class="small" id="payTCSub"></div></div></div><div class="notice warning" id="tcAlertBox" hidden></div></div>
+  </section>
 
-<main class="container">
-  <!-- 1. BALANCE -->
-  <section id="sec-resumen" class="tab-section">
-    <div class="card">
-      <div class="card-title">
-        <span>1. Ingresos Líquidos del Mes (CLP)</span>
-        <span style="font-size:0.75rem; color:var(--muted);" id="ratioIngresoLabel">44% / 56%</span>
-      </div>
-      <div class="grid-2">
-        <div>
-          <label for="incLuis">Ingreso Luis ($)</label>
-          <input type="number" id="incLuis" step="10000" />
-        </div>
-        <div>
-          <label for="incWife">Ingreso Esposa ($)</label>
-          <input type="number" id="incWife" step="10000" />
-        </div>
-      </div>
-      <div style="margin-top:10px;">
-        <label for="targetPocket">Meta mínima libre en tu bolsillo a fin de mes ($)</label>
-        <input type="number" id="targetPocket" step="10000" />
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><span>2. Balance Real vs. Reparto Justo</span></div>
-      <div class="grid-2">
-        <div class="stat-box">
-          <div class="stat-label">Gasto Total Hogar</div>
-          <div class="stat-val" id="totHogar">$0</div>
-          <div class="stat-sub" id="subGastosPers">Pers: $0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Te queda libre hoy</div>
-          <div class="stat-val" id="luisLibreHoy">$0</div>
-          <div class="stat-sub" id="wifeLibreHoy">Esposa libre: $0</div>
-        </div>
-      </div>
-
-      <div class="grid-2" style="margin-top:10px;">
-        <div class="stat-box">
-          <div class="stat-label">Aporte Real Actual</div>
-          <div class="stat-val text-blue" id="aporteRealLuis">$0</div>
-          <div class="stat-sub" id="aporteRealWife">Ella aporta: $0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Aporte Justo Proporcional</div>
-          <div class="stat-val text-green" id="aporteJustoLuis">$0</div>
-          <div class="stat-sub" id="aporteJustoWife">Ella debería: $0</div>
-        </div>
-      </div>
-
-      <div id="consejoBox" class="alert-box alert-info">Cargando análisis...</div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><span>3. Desglose por Método de Pago</span></div>
-      <div class="grid-3">
-        <div class="stat-box">
-          <div class="stat-label">Transferencia</div>
-          <div class="stat-val" id="payTransf">$0</div>
-          <div class="stat-sub" id="payTransfSub">L: $0 | E: $0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Débito</div>
-          <div class="stat-val" id="payDebito">$0</div>
-          <div class="stat-sub" id="payDebitoSub">L: $0 | E: $0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">T. Crédito</div>
-          <div class="stat-val text-amber" id="payTC">$0</div>
-          <div class="stat-sub" id="payTCSub">L: $0 | E: $0</div>
-        </div>
-      </div>
-      <div id="tcAlertBox" class="alert-box alert-warn hidden"></div>
+  <section id="sec-agregar" class="section" hidden>
+    <div class="panel"><div class="cardhead"><h2 id="formTitle">Registrar nuevo gasto</h2><button class="secondary" id="cancelEditBtn" hidden type="button">Cancelar edición</button></div>
+      <div class="field"><label for="expDesc">Descripción</label><input type="text" id="expDesc" maxlength="120" placeholder="Ej. Arriendo, supermercado, TAG..."></div>
+      <div class="grid2"><div class="field"><label for="expAmount">Monto total ($ CLP)</label><input type="number" id="expAmount" min="1" step="1" inputmode="numeric" placeholder="85000"></div><div class="field"><label for="expCat">Categoría</label><select id="expCat"><option>Vivienda y Servicios</option><option>Colegio Niña</option><option>Supermercado y Comida</option><option>Auto (Bencina/TAG/Mant.)</option><option>Salud y Farmacia</option><option>Salidas y Restaurantes</option><option>Personal / Otros</option></select></div></div>
+      <div class="field"><label>¿A quién corresponde este gasto?</label><div class="chipgroup" id="scopeChips"><button type="button" class="chip" data-val="Hogar" aria-pressed="true">Hogar / Familia</button><button type="button" class="chip" data-val="Personal" aria-pressed="false">Personal</button></div></div>
+      <div class="field"><label>¿Quién asume el costo? (reparto acordado)</label><div class="chipgroup" id="splitTypeChips"><button type="button" class="chip" data-val="50_50" aria-pressed="true">50 / 50</button><button type="button" class="chip" data-val="70_30" aria-pressed="false">70% Luis / 30% ella</button><button type="button" class="chip" data-val="100_luis" aria-pressed="false">100% Luis</button><button type="button" class="chip" data-val="100_wife" aria-pressed="false">100% esposa</button><button type="button" class="chip" data-val="custom" aria-pressed="false">Personalizado</button></div></div>
+      <div class="field" id="customSplitBox" hidden><label for="customLuisPct">Luis: <strong id="customPctLabel">50%</strong> / Esposa: <strong id="customWifePctLabel">50%</strong></label><input type="range" id="customLuisPct" min="0" max="100" step="1" value="50" style="width:100%"></div>
+      <div class="grid2"><div class="field"><label for="paidBy">¿Quién pagó realmente?</label><select id="paidBy"><option value="LUIS">Luis</option><option value="WIFE">Esposa</option></select></div><div class="field"><label for="payMethod">Método de pago</label><select id="payMethod"><option>Transferencia</option><option>Débito</option><option>Tarjeta de Crédito</option></select></div></div>
+      <button class="primary full" id="saveExpBtn" type="button">Guardar gasto</button>
     </div>
   </section>
 
-  <!-- 2. REGISTRAR -->
-  <section id="sec-agregar" class="tab-section hidden">
-    <div class="card">
-      <div class="card-title">
-        <span id="formTitle">Registrar Nuevo Gasto</span>
-        <button class="btn-secondary hidden" id="cancelEditBtn" type="button">Cancelar edición</button>
-      </div>
+  <section id="sec-lista" class="section" hidden><div class="panel"><div class="cardhead"><h2>Movimientos (<span id="countItems">0</span>)</h2><div class="quick"><button class="secondary" id="waBtn" type="button">WhatsApp</button><button class="secondary" id="csvBtn" type="button">CSV</button></div></div>
+    <div class="grid3"><select id="filterOwner" aria-label="Filtrar responsable"><option value="ALL">Responsables: todos</option><option value="SHARED">Compartidos</option><option value="LUIS">100% Luis</option><option value="WIFE">100% esposa</option></select><select id="filterPay" aria-label="Filtrar método"><option value="ALL">Todos los pagos</option><option>Transferencia</option><option>Débito</option><option>Tarjeta de Crédito</option></select><select id="filterScope" aria-label="Filtrar alcance"><option value="ALL">Hogar y personal</option><option>Hogar</option><option>Personal</option></select></div>
+    <div id="expenseList"></div><div class="quick" style="margin-top:15px"><button class="secondary" id="exportJsonBtn" type="button">Respaldar JSON</button><button class="secondary" id="importJsonBtn" type="button">Restaurar JSON</button><input id="importJsonInput" type="file" accept=".json,application/json" hidden></div><div class="hint">Tus datos se guardan en este navegador y dispositivo. Exporta el respaldo periódicamente. No se sincronizan automáticamente con el teléfono de tu esposa.</div>
+  </div></section>
 
-      <div style="margin-bottom:10px;">
-        <label for="expDesc">Concepto o descripción</label>
-        <input type="text" id="expDesc" placeholder="Ej: Arriendo, Supermercado, Cambio de aceite, Médico..." />
-      </div>
+  <section id="sec-graficos" class="section" hidden><div class="panel"><h2>Resumen por tipo de gasto</h2><div class="grid2"><div class="stat"><label>Hogar</label><strong class="blue" id="chartTotGeneral">$0</strong><div class="small" id="chartPctGeneral"></div></div><div class="stat"><label>Personal</label><strong class="purple" id="chartTotPersonal">$0</strong><div class="small" id="chartSubPersonal"></div></div></div></div><div class="panel"><h2>Categorías: gastos del hogar</h2><div id="chartGeneralBars"></div></div><div class="panel"><h2>Categorías: gastos personales</h2><div id="chartPersonalBars"></div></div></section>
 
-      <div class="grid-2" style="margin-bottom:10px;">
-        <div>
-          <label for="expAmount">Monto total ($ CLP)</label>
-          <input type="number" id="expAmount" placeholder="Ej: 85000" />
-        </div>
-        <div>
-          <label for="expCat">Categoría</label>
-          <select id="expCat">
-            <option value="Vivienda y Servicios">Vivienda y Servicios</option>
-            <option value="Colegio Niña">Colegio Niña</option>
-            <option value="Supermercado y Comida">Supermercado y Comida</option>
-            <option value="Auto (Bencina/TAG/Mant.)">Auto (Bencina/TAG/Mant.)</option>
-            <option value="Salud y Farmacia">Salud y Farmacia</option>
-            <option value="Salidas y Restaurantes">Salidas y Restaurantes</option>
-            <option value="Personal / Otros">Personal / Otros</option>
-          </select>
-        </div>
-      </div>
-
-      <div style="margin-bottom:10px;">
-        <label>¿Quién asume este gasto?</label>
-        <div class="chip-group" id="splitTypeChips">
-          <div class="chip active" data-val="50_50">50 / 50</div>
-          <div class="chip" data-val="70_30">70% Luis / 30% Ella</div>
-          <div class="chip" data-val="100_luis">100% Luis</div>
-          <div class="chip" data-val="100_wife">100% Esposa</div>
-          <div class="chip" data-val="custom">% Personalizado</div>
-        </div>
-      </div>
-
-      <div id="customSplitBox" class="hidden" style="margin-bottom:10px; background:var(--surface-2); padding:10px; border-radius:10px;">
-        <label for="customLuisPct">Porcentaje que paga Luis: <strong id="customPctLabel">50%</strong> (Esposa: <span id="customWifePctLabel">50%</span>)</label>
-        <input type="range" id="customLuisPct" min="0" max="100" value="50" style="width:100%;" />
-      </div>
-
-      <div style="margin-bottom:10px;">
-        <label>Método de pago utilizado</label>
-        <div class="chip-group" id="payMethodChips">
-          <div class="chip active-pay" data-val="Transferencia">Transferencia</div>
-          <div class="chip" data-val="Débito">Débito</div>
-          <div class="chip" data-val="Tarjeta de Crédito">Tarjeta de Crédito</div>
-        </div>
-      </div>
-
-      <div style="margin-bottom:6px;">
-        <label>Alcance del gasto</label>
-        <div class="chip-group" id="scopeChips">
-          <div class="chip active" data-val="Hogar">Gasto del Hogar / Familia</div>
-          <div class="chip" data-val="Personal">Gasto Personal Individual</div>
-        </div>
-      </div>
-
-      <button class="btn-primary" id="saveExpBtn" type="button">Guardar Gasto</button>
-    </div>
-  </section>
-
-  <!-- 3. MOVIMIENTOS -->
-  <section id="sec-lista" class="tab-section hidden">
-    <div class="card">
-      <div class="card-title">
-        <span>Movimientos del Mes (<span id="countItems">0</span>)</span>
-        <div style="display:flex; gap:6px;">
-          <button class="btn-secondary" id="waBtn" type="button">WhatsApp</button>
-          <button class="btn-secondary" id="csvBtn" type="button">CSV</button>
-        </div>
-      </div>
-
-      <div class="grid-3" style="margin-bottom:10px;">
-        <select id="filterOwner">
-          <option value="ALL">Todos (Responsable)</option>
-          <option value="SHARED">Compartidos</option>
-          <option value="LUIS">100% Luis</option>
-          <option value="WIFE">100% Esposa</option>
-        </select>
-        <select id="filterPay">
-          <option value="ALL">Todos (Pago)</option>
-          <option value="Transferencia">Transferencia</option>
-          <option value="Débito">Débito</option>
-          <option value="Tarjeta de Crédito">T. Crédito</option>
-        </select>
-        <select id="filterScope">
-          <option value="ALL">Hogar + Personal</option>
-          <option value="Hogar">Solo Hogar</option>
-          <option value="Personal">Solo Personal</option>
-        </select>
-      </div>
-
-      <div id="expenseList"></div>
-
-      <div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--border); display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn-secondary" id="exportJsonBtn" type="button">Respaldar JSON</button>
-        <button class="btn-secondary" id="importJsonBtn" type="button">Restaurar JSON</button>
-        <input type="file" id="importJsonInput" accept=".json" class="hidden" />
-      </div>
-    </div>
-  </section>
-
-  <!-- 4. GRÁFICOS -->
-  <section id="sec-graficos" class="tab-section hidden">
-    <div class="card">
-      <div class="card-title"><span>Resumen: General (Hogar) vs. Personal</span></div>
-      <div class="grid-2">
-        <div class="stat-box">
-          <div class="stat-label">Total General (Hogar)</div>
-          <div class="stat-val text-blue" id="chartTotGeneral">$0</div>
-          <div class="stat-sub" id="chartPctGeneral">0% del total</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Total Personal</div>
-          <div class="stat-val" style="color:var(--purple);" id="chartTotPersonal">$0</div>
-          <div class="stat-sub" id="chartSubPersonal">Luis: $0 | Esposa: $0</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><span>En qué se gasta más — General (Hogar)</span></div>
-      <div id="chartGeneralBars"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><span>En qué se gasta más — Personal</span></div>
-      <div id="chartPersonalBars"></div>
-    </div>
-  </section>
-
-  <!-- 5. METAS DE AHORRO -->
-  <section id="sec-metas" class="tab-section hidden">
-    <div class="card">
-      <div class="card-title"><span>Resumen de Ahorro por Metas</span></div>
-      <div class="grid-2">
-        <div class="stat-box">
-          <div class="stat-label">Total Ahorrado en Metas</div>
-          <div class="stat-val text-green" id="goalsSavedTotal">$0</div>
-          <div class="stat-sub" id="goalsTargetTotal">Meta total: $0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Tu saldo libre estimado este mes</div>
-          <div class="stat-val text-blue" id="goalsMonthFree">$0</div>
-          <div class="stat-sub">Referencia del mes seleccionado</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><span>Nueva Meta de Ahorro</span></div>
-      <div style="margin-bottom:10px;">
-        <label for="goalName">Nombre de la meta</label>
-        <input type="text" id="goalName" placeholder="Ej: Fondo de emergencia, Mantención auto, Paseos..." />
-      </div>
-      <div class="grid-2">
-        <div>
-          <label for="goalTarget">Monto objetivo ($ CLP)</label>
-          <input type="number" id="goalTarget" placeholder="Ej: 500000" />
-        </div>
-        <div>
-          <label for="goalCurrent">Monto inicial ahorrado ($ CLP)</label>
-          <input type="number" id="goalCurrent" placeholder="0" value="0" />
-        </div>
-      </div>
-      <button class="btn-primary" id="saveGoalBtn" type="button">Crear Meta</button>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><span>Mis Metas (<span id="goalsCount">0</span>)</span></div>
-      <div id="goalsList"></div>
-    </div>
+  <section id="sec-metas" class="section" hidden><div class="panel"><h2>Resumen de ahorro</h2><div class="grid2"><div class="stat"><label>Ahorrado en metas</label><strong class="green" id="goalsSavedTotal">$0</strong><div class="small" id="goalsTargetTotal"></div></div><div class="stat"><label>Saldo estimado de Luis</label><strong class="blue" id="goalsMonthFree">$0</strong><div class="small">Mes seleccionado</div></div></div><div class="hint">Las metas registran ahorros acumulados. Los aportes no se contabilizan automáticamente como gastos del mes.</div></div>
+    <div class="panel"><h2>Crear meta de ahorro</h2><div class="field"><label for="goalName">Nombre de la meta</label><input type="text" id="goalName" maxlength="80" placeholder="Ej. Fondo de emergencia"></div><div class="grid2"><div class="field"><label for="goalTarget">Objetivo ($)</label><input type="number" id="goalTarget" min="1" step="1" inputmode="numeric"></div><div class="field"><label for="goalCurrent">Monto ahorrado inicial ($)</label><input type="number" id="goalCurrent" min="0" step="1" inputmode="numeric" value="0"></div></div><button class="primary full" id="saveGoalBtn" type="button">Crear meta</button></div>
+    <div class="panel"><h2>Mis metas (<span id="goalsCount">0</span>)</h2><div id="goalsList"></div></div>
   </section>
 </main>
-
-<nav class="tabs" id="bottomTabs">
-  <button class="tab-btn active" data-tab="resumen" type="button"><span>📊</span><span>Balance</span></button>
-  <button class="tab-btn" data-tab="agregar" type="button"><span>➕</span><span>Registrar</span></button>
-  <button class="tab-btn" data-tab="lista" type="button"><span>📋</span><span>Movimientos</span></button>
-  <button class="tab-btn" data-tab="graficos" type="button"><span>📈</span><span>Gráficos</span></button>
-  <button class="tab-btn" data-tab="metas" type="button"><span>🎯</span><span>Metas</span></button>
-</nav>
-
+<nav aria-label="Navegación principal" id="bottomTabs"><button type="button" data-tab="resumen" aria-current="page"><span>📊</span><span>Balance</span></button><button type="button" data-tab="agregar"><span>➕</span><span>Registrar</span></button><button type="button" data-tab="lista"><span>📋</span><span>Movimientos</span></button><button type="button" data-tab="graficos"><span>📈</span><span>Gráficos</span></button><button type="button" data-tab="metas"><span>🎯</span><span>Metas</span></button></nav>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 <script>
-  (function () {
-    const STORAGE_KEY = 'finanzas_hogar_pwa_v5';
-    const LEGACY_KEYS = ['finanzas_hogar_pwa_v8', 'finanzas_hogar_pwa_v6', 'finanzas_hogar_pwa_v3', 'finanzas_hogar_pwa_v2', 'finanzas_hogar_pwa_v1'];
+(() => {
+  'use strict';
+  const KEY = 'finanzas_hogar_v9';
+  const $ = id => document.getElementById(id);
+  const money = x => new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Number(x)||0);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const val = id => $(id).value;
+  const nat = x => Number.isFinite(Number(x)) ? Math.max(0,Math.round(Number(x))) : 0;
+  const uid = () => (globalThis.crypto?.randomUUID?.() || 'id-'+Date.now()+'-'+Math.random().toString(36).slice(2));
+  const todayMonth = () => {const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
+  const previousMonth = m => {const [y,mo]=m.split('-').map(Number);return new Date(y,mo-2,1).getFullYear()+'-'+String(new Date(y,mo-2,1).getMonth()+1).padStart(2,'0')};
+  const emptyMonth = () => ({incomeLuis:0,incomeWife:0,targetPocket:0,expenses:[]});
+  let db = {version:9,months:{},goals:[]}, currentMonth=todayMonth(), editId=null, splitType='50_50', scope='Hogar', toastTimer;
 
-    let db = {};
-    try { db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {}; } catch (_) { db = {}; }
-
-    function hasAnyMonthData(obj) {
-      if (!obj || typeof obj !== 'object') return false;
-      return Object.keys(obj).some((k) => {
-        if (k.startsWith('_')) return false;
-        const m = obj[k];
-        return m && Array.isArray(m.expenses) && m.expenses.length > 0;
-      });
+  function toast(message){const el=$('toast');el.textContent=message;el.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.hidden=true,3500)}
+  function normalizeExpense(e){
+    if(!e || typeof e!=='object')return null;
+    const amount=nat(e.amount), rawPct=Number(e.luisPct ?? 50), pct=Number.isFinite(rawPct)?Math.max(0,Math.min(100,rawPct)):50;
+    if(!amount || !String(e.desc??'').trim())return null;
+    return {id:String(e.id||uid()),desc:String(e.desc).slice(0,120),amount,cat:String(e.cat||'Personal / Otros'),scope:e.scope==='Personal'?'Personal':'Hogar',luisPct:pct,paidBy:e.paidBy==='WIFE'?'WIFE':'LUIS',payMethod:['Transferencia','Débito','Tarjeta de Crédito'].includes(e.payMethod)?e.payMethod:'Transferencia',createdAt:String(e.createdAt||new Date().toISOString())};
+  }
+  function normalizeDB(o){
+    if(!o || typeof o!=='object' || typeof o.months!=='object' || !o.months || !Array.isArray(o.goals))throw Error('El archivo no tiene el formato de respaldo de Finanzas del Hogar.');
+    const result={version:9,months:{},goals:[]};
+    for(const [month,record] of Object.entries(o.months)){
+      if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)||!record||typeof record!=='object')continue;
+      result.months[month]={incomeLuis:nat(record.incomeLuis),incomeWife:nat(record.incomeWife),targetPocket:nat(record.targetPocket),expenses:Array.isArray(record.expenses)?record.expenses.map(normalizeExpense).filter(Boolean):[]};
     }
+    result.goals=o.goals.filter(g=>g && String(g.name||'').trim() && nat(g.target)>0).map(g=>({id:String(g.id||uid()),name:String(g.name).slice(0,80),target:nat(g.target),current:nat(g.current)}));
+    return result;
+  }
+  function load(){try{const raw=localStorage.getItem(KEY);if(raw)db=normalizeDB(JSON.parse(raw))}catch(err){console.error(err);toast('No se pudieron leer los datos guardados. Revisa tu respaldo.')}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(db));return true}catch(err){console.error(err);alert('No fue posible guardar en este dispositivo. Exporta un respaldo y revisa el almacenamiento del navegador.');return false}}
+  function monthData(){return db.months[currentMonth]||(db.months[currentMonth]=emptyMonth())}
+  function splitPct(){return splitType==='50_50'?50:splitType==='70_30'?70:splitType==='100_luis'?100:splitType==='100_wife'?0:Number(val('customLuisPct'))}
+  function chooseChip(group,value){document.querySelectorAll('#'+group+' [data-val]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.val===value)))}
+  function chooseSplit(type){splitType=type;chooseChip('splitTypeChips',type);$('customSplitBox').hidden=type!=='custom'}
+  function chooseScope(type){scope=type;chooseChip('scopeChips',type);if(type==='Personal' && !['100_luis','100_wife'].includes(splitType))chooseSplit(val('paidBy')==='WIFE'?'100_wife':'100_luis')}
+  function showTab(name){document.querySelectorAll('.section').forEach(s=>s.hidden=s.id!=='sec-'+name);document.querySelectorAll('nav [data-tab]').forEach(b=>{if(b.dataset.tab===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});window.scrollTo({top:0,behavior:'instant'})}
+  window.irPestana=showTab; // Compatibilidad con enlaces de versiones anteriores.
 
-    if (!hasAnyMonthData(db)) {
-      for (const k of LEGACY_KEYS) {
-        try {
-          const old = JSON.parse(localStorage.getItem(k) || 'null');
-          if (hasAnyMonthData(old)) {
-            db = Object.assign({}, old, db);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-            break;
-          }
-        } catch (_) {}
-      }
-    }
+  function resetForm(){editId=null;$('formTitle').textContent='Registrar nuevo gasto';$('saveExpBtn').textContent='Guardar gasto';$('cancelEditBtn').hidden=true;$('expDesc').value='';$('expAmount').value='';$('expCat').selectedIndex=0;$('paidBy').value='LUIS';$('payMethod').value='Transferencia';$('customLuisPct').value='50';chooseSplit('50_50');chooseScope('Hogar');updateCustom()}
+  function updateCustom(){$('customPctLabel').textContent=val('customLuisPct')+'%';$('customWifePctLabel').textContent=(100-Number(val('customLuisPct')))+'%'}
+  function saveExpense(){const desc=val('expDesc').trim(),amount=Number(val('expAmount'));if(!desc){toast('Escribe la descripción del gasto.');$('expDesc').focus();return}if(!Number.isSafeInteger(amount)||amount<=0){toast('Ingresa un monto válido y mayor que cero.');$('expAmount').focus();return}
+    const pct=splitPct();if(scope==='Personal' && pct!==0 && pct!==100){toast('Un gasto personal debe corresponder 100% a una persona.');return}
+    const old=monthData().expenses.find(x=>x.id===editId);
+    const e={id:editId||uid(),desc,amount,cat:val('expCat'),scope,luisPct:pct,paidBy:val('paidBy'),payMethod:val('payMethod'),createdAt:old?.createdAt||new Date().toISOString()};
+    if(old)Object.assign(old,e);else monthData().expenses.unshift(e);save();resetForm();render();showTab('lista');toast(old?'Gasto actualizado.':'Gasto registrado.');
+  }
+  function editExpense(id){const e=monthData().expenses.find(x=>x.id===id);if(!e)return;editId=id;$('formTitle').textContent='Editar gasto';$('saveExpBtn').textContent='Guardar cambios';$('cancelEditBtn').hidden=false;$('expDesc').value=e.desc;$('expAmount').value=e.amount;$('expCat').value=e.cat;$('paidBy').value=e.paidBy;$('payMethod').value=e.payMethod;$('customLuisPct').value=e.luisPct;
+    chooseScope(e.scope);chooseSplit(e.luisPct===50?'50_50':e.luisPct===70?'70_30':e.luisPct===100?'100_luis':e.luisPct===0?'100_wife':'custom');updateCustom();showTab('agregar');
+  }
+  function deleteExpense(id){const e=monthData().expenses.find(x=>x.id===id);if(!e||!confirm('¿Eliminar el gasto «'+e.desc+'» de '+money(e.amount)+'?'))return;monthData().expenses=monthData().expenses.filter(x=>x.id!==id);if(editId===id)resetForm();save();render();toast('Gasto eliminado.')}
+  function totals(){const m=monthData(),expenses=m.expenses,home=expenses.filter(e=>e.scope==='Hogar'),personal=expenses.filter(e=>e.scope==='Personal');const sum=a=>a.reduce((s,e)=>s+e.amount,0);
+    const paidLuis=expenses.filter(e=>e.paidBy==='LUIS').reduce((s,e)=>s+e.amount,0),paidWife=sum(expenses)-paidLuis;
+    const paidHomeLuis=home.filter(e=>e.paidBy==='LUIS').reduce((s,e)=>s+e.amount,0),paidHomeWife=sum(home)-paidHomeLuis;
+    const dueLuis=expenses.reduce((s,e)=>s+Math.round(e.amount*e.luisPct/100),0);const dueWife=sum(expenses)-dueLuis;
+    const personalLuis=personal.reduce((s,e)=>s+Math.round(e.amount*e.luisPct/100),0);
+    return {m,expenses,home,personal,total:sum(expenses),homeTotal:sum(home),personalTotal:sum(personal),paidLuis,paidWife,paidHomeLuis,paidHomeWife,dueLuis,dueWife,personalLuis,personalWife:sum(personal)-personalLuis,freeLuis:m.incomeLuis-paidLuis,freeWife:m.incomeWife-paidWife};
+  }
+  function setText(id,text){$(id).textContent=text}
+  function renderBalance(t){const allInc=t.m.incomeLuis+t.m.incomeWife,lratio=allInc?t.m.incomeLuis/allInc:0,ratioText=allInc?`${Math.round(lratio*100)}% Luis / ${Math.round((1-lratio)*100)}% esposa`:'Falta registrar ingresos';
+    setText('ratioIngresoLabel','Proporción de ingresos: '+ratioText);setText('totHogar',money(t.homeTotal));setText('subGastosPers','Personales: '+money(t.personalTotal));setText('luisLibreHoy',money(t.freeLuis));setText('wifeLibreHoy','Esposa: '+money(t.freeWife));setText('aporteRealLuis',money(t.paidHomeLuis));setText('aporteRealWife','Esposa: '+money(t.paidHomeWife));
+    const propLuis=Math.round(t.homeTotal*lratio);setText('aporteJustoLuis',money(propLuis));setText('aporteJustoWife','Esposa: '+money(t.homeTotal-propLuis));
+    const balance=t.paidLuis-t.dueLuis;const abs=money(Math.abs(balance));let advice=t.total===0?'Registra los primeros gastos para calcular cuánto aportó cada uno.':balance>0?'Según el reparto acordado, tu esposa debería compensarte '+abs+'.':balance<0?'Según el reparto acordado, deberías compensar a tu esposa '+abs+'.':'Según el reparto acordado, ambos están al día: no hay compensaciones pendientes.';
+    if(allInc===0 && t.homeTotal)advice+=' Ingresa los sueldos para ver la referencia proporcional.';
 
-    if (!Array.isArray(db._goals)) {
-      db._goals = [
-        { id: 'g1', name: 'Colchón / Imprevistos del mes', target: 350000, current: 0 },
-        { id: 'g2', name: 'Mantención y neumáticos auto', target: 400000, current: 0 }
-      ];
-    }
+                            
+ if(t.freeLuis<t.m.targetPocket)advice+=' Tu saldo estimado está '+money(t.m.targetPocket-t.freeLuis)+' por debajo del mínimo que quieres conservar.';
+    setText('consejoBox',advice);
+    for(const [method,id,sub] of [['Transferencia','payTransf','payTransfSub'],['Débito','payDebito','payDebitoSub'],['Tarjeta de Crédito','payTC','payTCSub']]){const subset=t.expenses.filter(e=>e.payMethod===method);setText(id,money(subset.reduce((s,e)=>s+e.amount,0)));setText(sub,`L: ${money(subset.filter(e=>e.paidBy==='LUIS').reduce((s,e)=>s+e.amount,0))} · E: ${money(subset.filter(e=>e.paidBy==='WIFE').reduce((s,e)=>s+e.amount,0))}`)}
+    const credit=t.expenses.filter(e=>e.payMethod==='Tarjeta de Crédito').reduce((s,e)=>s+e.amount,0);$('tcAlertBox').hidden=!credit;if(credit)setText('tcAlertBox','Compras registradas con tarjeta de crédito: '+money(credit)+'. Este monto es un compromiso; verifica aparte la fecha de pago de la tarjeta para no duplicarlo.');
+    $('goalsMonthFree').textContent=money(t.freeLuis);
+  }
+  function renderExpenses(t){const owner=val('filterOwner'),pay=val('filterPay'),scopeFilter=val('filterScope');const visible=t.expenses.filter(e=>(owner==='ALL'||(owner==='SHARED'&&e.luisPct>0&&e.luisPct<100)||(owner==='LUIS'&&e.luisPct===100)||(owner==='WIFE'&&e.luisPct===0))&&(pay==='ALL'||e.payMethod===pay)&&(scopeFilter==='ALL'||e.scope===scopeFilter));setText('countItems',visible.length);
+    $('expenseList').innerHTML=visible.length?visible.map(e=>`<div class="item"><div><h3>${esc(e.desc)}</h3><div class="small">${esc(e.cat)}</div><div class="tags"><span class="tag ${e.scope==='Personal'?'pers':''}">${esc(e.scope)}</span><span class="tag">Luis ${e.luisPct}% / Esposa ${100-e.luisPct}%</span><span class="tag pay">${esc(e.payMethod)}</span><span class="tag">Pagó: ${e.paidBy==='LUIS'?'Luis':'Esposa'}</span></div></div><div class="right"><strong>${money(e.amount)}</strong><div class="small">Luis asume ${money(Math.round(e.amount*e.luisPct/100))}</div><div class="actions"><button class="secondary" type="button" data-action="edit" data-id="${esc(e.id)}">Editar</button><button class="secondary dangerbtn" type="button" data-action="delete" data-id="${esc(e.id)}">Eliminar</button></div></div></div>`).join(''):'<div class="empty">No hay gastos que coincidan con los filtros de este mes.</div>';
+  }
+  function bars(element,expenses,color){const sums={};for(const e of expenses)sums[e.cat]=(sums[e.cat]||0)+e.amount;const sorted=Object.entries(sums).sort((a,b)=>b[1]-a[1]);const max=sorted.length?sorted[0][1]:1;$(element).innerHTML=sorted.length?sorted.map(([cat,total])=>`<div class="barrow"><div class="barlabel"><span>${esc(cat)}</span><span>${money(total)}</span></div><div class="bartrack"><div class="barfill ${color}" style="width:${(total/max)*100}%"></div></div></div>`).join(''):'<div class="empty">Aún no hay gastos de este tipo.</div>'}
+  function renderCharts(t){setText('chartTotGeneral',money(t.homeTotal));setText('chartPctGeneral',t.total?Math.round(100*t.homeTotal/t.total)+'% del gasto total':'Sin movimientos');setText('chartTotPersonal',money(t.personalTotal));setText('chartSubPersonal','Luis: '+money(t.personalLuis)+' · Esposa: '+money(t.personalWife));bars('chartGeneralBars',t.home,'');bars('chartPersonalBars',t.personal,'pers')}
+  function renderGoals(){const saved=db.goals.reduce((s,g)=>s+g.current,0),target=db.goals.reduce((s,g)=>s+g.target,0);setText('goalsSavedTotal',money(saved));setText('goalsTargetTotal','Objetivo conjunto: '+money(target));setText('goalsCount',String(db.goals.length));$('goalsList').innerHTML=db.goals.length?db.goals.map(g=>{const pct=Math.min(100,Math.round(g.current/g.target*100));return `<div class="goalbox"><div class="goalhead"><strong>${esc(g.name)}</strong><strong class="green">${pct}%</strong></div><div class="small">${money(g.current)} de ${money(g.target)}</div><div class="bartrack" style="margin-top:9px"><div class="barfill goal" style="width:${pct}%"></div></div><div class="actions"><button type="button" class="secondary" data-goal="add" data-id="${esc(g.id)}">+ Aportar</button><button type="button" class="secondary" data-goal="withdraw" data-id="${esc(g.id)}">Retirar</button><button type="button" class="secondary dangerbtn" data-goal="delete" data-id="${esc(g.id)}">Eliminar</button></div></div>`}).join(''):'<div class="empty">Todavía no has creado metas de ahorro.</div>'}
+  function saveGoal(){const name=val('goalName').trim(),target=Number(val('goalTarget')),current=Number(val('goalCurrent'));if(!name||!Number.isSafeInteger(target)||target<=0||!Number.isSafeInteger(current)||current<0){toast('Completa la meta con montos válidos.');return}db.goals.push({id:uid(),name,target,current});save();$('goalName').value='';$('goalTarget').value='';$('goalCurrent').value='0';render();toast('Meta creada.')}
+  function modifyGoal(action,id){const g=db.goals.find(x=>x.id===id);if(!g)return;if(action==='delete'){if(!confirm('¿Eliminar la meta «'+g.name+'»?'))return;db.goals=db.goals.filter(x=>x.id!==id)}else{const input=prompt(action==='add'?'¿Cuánto deseas aportar a «'+g.name+'»?':'¿Cuánto deseas retirar de «'+g.name+'»?','10000');if(input===null)return;const amount=Number(input.trim().replace(/\s/g,''));if(!Number.isSafeInteger(amount)||amount<=0){toast('Escribe un monto entero mayor que cero.');return}if(action==='withdraw'&&amount>g.current){toast('El retiro supera el monto ahorrado.');return}g.current+=action==='add'?amount:-amount}save();render();toast('Meta actualizada.')}
+  function render(){const t=totals();renderBalance(t);renderExpenses(t);renderCharts(t);renderGoals()}
+  function fillMonth(){const m=monthData();$('incLuis').value=m.incomeLuis||'';$('incWife').value=m.incomeWife||'';$('targetPocket').value=m.targetPocket||'';render()}
+  function download(name,type,contents){const blob=new Blob([contents],{type});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000)}
+  function downloadJSON(){download('respaldo-finanzas-hogar-'+todayMonth()+'.json','application/json;charset=utf-8',JSON.stringify(db,null,2));toast('Respaldo descargado.')}
+  function safeCsv(v){let s=String(v??'');if(/^[=+@-]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'}
+  function downloadCSV(){const rows=[['Mes','Descripción','Monto CLP','Categoría','Alcance','Porcentaje Luis','Paga','Método'],...monthData().expenses.map(e=>[currentMonth,e.desc,e.amount,e.cat,e.scope,e.luisPct,e.paidBy==='LUIS'?'Luis':'Esposa',e.payMethod])];download('gastos-'+currentMonth+'.csv','text/csv;charset=utf-8','\ufeff'+rows.map(r=>r.map(safeCsv).join(';')).join('\r\n'));toast('CSV descargado.')}
+  function copyPrevious(){const from=db.months[previousMonth(currentMonth)];if(!from){toast('No hay datos del mes anterior.');return}const dest=monthData();if((dest.expenses.length||dest.incomeLuis||dest.incomeWife)&&!confirm('Este mes ya tiene datos. ¿Sobrescribirlo con una copia del mes anterior?'))return;db.months[currentMonth]={incomeLuis:from.incomeLuis,incomeWife:from.incomeWife,targetPocket:from.targetPocket,expenses:from.expenses.map(e=>({...e,id:uid(),createdAt:new Date().toISOString()}))};save();resetForm();fillMonth();toast('Mes anterior copiado. Revisa y actualiza montos.')}
+  function makeTemplate(){const base=['Arriendo / dividendo','Electricidad','Agua','Internet / telefonía','Supermercado','Colegio / transporte','Bencina / TAG'];const exists=new Set(monthData().expenses.map(e=>e.desc.toLowerCase()));let added=0;for(const desc of base){if(exists.has(desc.toLowerCase()))continue;monthData().expenses.push({id:uid(),desc,amount:1,cat:desc.includes('Colegio')?'Colegio Niña':desc.includes('Supermercado')?'Supermercado y Comida':desc.includes('Bencina')?'Auto (Bencina/TAG/Mant.)':'Vivienda y Servicios',scope:'Hogar',luisPct:50,paidBy:'LUIS',payMethod:'Transferencia',createdAt:new Date().toISOString()});added++}if(!added){toast('La plantilla ya existe para este mes.');return}save();render();showTab('lista');alert('Se agregaron '+added+' gastos de ejemplo con $1 para que puedas editarlos. Actualiza cada monto y quién pagó antes de utilizar el balance.')}
+  function sendWhatsApp(){const t=totals();const lines=[`Finanzas del Hogar — ${currentMonth}`,`Ingresos: Luis ${money(t.m.incomeLuis)} / Esposa ${money(t.m.incomeWife)}`,`Gastos hogar: ${money(t.homeTotal)}`,`Gastos personales: ${money(t.personalTotal)}`,`Total: ${money(t.total)}`,...t.expenses.map(e=>`• ${e.desc}: ${money(e.amount)} (${e.scope}; pagó ${e.paidBy==='LUIS'?'Luis':'Esposa'})`)];const url='https://wa.me/?text='+encodeURIComponent(lines.join('\n'));const w=window.open(url,'_blank','noopener,noreferrer');if(!w){navigator.clipboard?.writeText(lines.join('\n')).then(()=>toast('Resumen copiado para compartir.')).catch(()=>toast('Activa ventanas emergentes para compartir.'))}}
+  async function restoreJSON(file){if(!file)return;try{if(file.size>5*1024*1024)throw Error('El archivo es demasiado grande.');const incoming=normalizeDB(JSON.parse(await file.text()));if(!confirm('Restaurar reemplazará TODOS los datos actuales en este navegador. ¿Ya descargaste un respaldo y deseas continuar?'))return;db=incoming;save();resetForm();fillMonth();toast('Respaldo restaurado.') }catch(err){alert('No se pudo restaurar: '+err.message)}finally{$('importJsonInput').value=''}}
 
-    let editingId = null;
-    let currentSplit = '50_50';
-    let currentPay = 'Transferencia';
-    let currentScope = 'Hogar';
-
-    const monthPicker = document.getElementById('monthPicker');
-    const now = new Date();
-    monthPicker.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-
-    function saveDB() {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } catch (_) {}
-    }
-
-    function ensureMonth(m) {
-      const key = m || monthPicker.value || '2026-11';
-      if (!db[key]) {
-        db[key] = { incLuis: 1450000, incWife: 1850000, targetPocket: 350000, expenses: [] };
-        saveDB();
-      }
-      return db[key];
-    }
-
-    function fmt(n) {
-      return '$' + Math.round(Number(n) || 0).toLocaleString('es-CL');
-    }
-
-    function switchTab(tab) {
-      const map = {
-        resumen: 'sec-resumen',
-        agregar: 'sec-agregar',
-        lista: 'sec-lista',
-        graficos: 'sec-graficos',
-        metas: 'sec-metas'
-      };
-      const targetId = map[tab] || 'sec-resumen';
-      document.querySelectorAll('.tab-section').forEach((sec) => {
-        if (sec.id === targetId) sec.classList.remove('hidden');
-        else sec.classList.add('hidden');
-      });
-      document.querySelectorAll('#bottomTabs .tab-btn').forEach((btn) => {
-        btn.classList.toggle('active', btn.dataset.tab === tab);
-      });
-      window.scrollTo(0, 0);
-    }
-
-    document.querySelectorAll('#bottomTabs .tab-btn').forEach((btn) => {
-      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-    });
-
-    function selectSplitType(val) {
-      currentSplit = val;
-      document.querySelectorAll('#splitTypeChips .chip').forEach((c) => c.classList.toggle('active', c.dataset.val === val));
-      document.getElementById('customSplitBox').classList.toggle('hidden', val !== 'custom');
-    }
-
-    function updateCustomPctLabel() {
-      const v = parseInt(document.getElementById('customLuisPct').value, 10) || 0;
-      document.getElementById('customPctLabel').textContent = `${v}%`;
-      document.getElementById('customWifePctLabel').textContent = `${100 - v}%`;
-    }
-
-    function selectPayMethod(val) {
-      currentPay = val;
-      document.querySelectorAll('#payMethodChips .chip').forEach((c) => c.classList.toggle('active-pay', c.dataset.val === val));
-    }
-
-    function selectScope(val) {
-      currentScope = val;
-      document.querySelectorAll('#scopeChips .chip').forEach((c) => c.classList.toggle('active', c.dataset.val === val));
-    }
-
-    document.querySelectorAll('#splitTypeChips .chip').forEach((c) => c.addEventListener('click', () => selectSplitType(c.dataset.val)));
-    document.querySelectorAll('#payMethodChips .chip').forEach((c) => c.addEventListener('click', () => selectPayMethod(c.dataset.val)));
-    document.querySelectorAll('#scopeChips .chip').forEach((c) => c.addEventListener('click', () => selectScope(c.dataset.val)));
-
-    function getLuisPct(exp) {
-      if (exp.split === '50_50') return 50;
-      if (exp.split === '70_30') return 70;
-      if (exp.split === '100_luis') return 100;
-      if (exp.split === '100_wife') return 0;
-      return Number(exp.luisPct ?? 50);
-    }
-
-    function resetForm() {
-      editingId = null;
-      document.getElementById('formTitle').textContent = 'Registrar Nuevo Gasto';
-      document.getElementById('saveExpBtn').textContent = 'Guardar Gasto';
-      document.getElementById('cancelEditBtn').classList.add('hidden');
-      document.getElementById('expDesc').value = '';
-      document.getElementById('expAmount').value = '';
-      selectSplitType('50_50');
-      selectPayMethod('Transferencia');
-      selectScope('Hogar');
-    }
-
-    function saveExpense() {
-      const desc = document.getElementById('expDesc').value.trim();
-      const amount = Number(document.getElementById('expAmount').value);
-      const cat = document.getElementById('expCat').value;
-      if (!desc || !amount || amount <= 0) {
-        alert('Ingresa una descripción y un monto válido.');
-        return;
-      }
-      const data = ensureMonth(monthPicker.value);
-      const luisPct = currentSplit === 'custom'
-        ? Number(document.getElementById('customLuisPct').value)
-        : getLuisPct({ split: currentSplit });
-
-      const payload = {
-        id: editingId || Date.now().toString(),
-        desc, amount, cat, split: currentSplit, luisPct, pay: currentPay, scope: currentScope
-      };
-
-      if (editingId) {
-        const idx = data.expenses.findIndex((e) => e.id === editingId);
-        if (idx !== -1) data.expenses[idx] = payload;
-      } else {
-        data.expenses.unshift(payload);
-      }
-
-      saveDB();
-      resetForm();
-      renderAll();
-      switchTab('lista');
-    }
-
-    function renderBars(containerId, mapObj, totalVal, barClass, emptyText) {
-      const el = document.getElementById(containerId);
-      const entries = Object.entries(mapObj).sort((a, b) => b[1] - a[1]);
-      if (!entries.length || totalVal <= 0) {
-        el.innerHTML = `<p style="color:var(--muted); font-size:0.84rem; text-align:center; padding:12px 0;">${emptyText}</p>`;
-        return;
-      }
-      const maxVal = entries[0][1] || 1;
-      el.innerHTML = entries.map(([label, val]) => {
-        const widthPct = Math.max(4, Math.round((val / maxVal) * 100));
-        const sharePct = Math.round((val / totalVal) * 100);
-        return `
-          <div class="bar-row">
-            <div class="bar-head"><span>${label} (${sharePct}%)</span><span>${fmt(val)}</span></div>
-            <div class="bar-track"><div class="bar-fill ${barClass}" style="width:${widthPct}%;"></div></div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderCharts(expenses) {
-      const byGen = {}, byPers = {};
-      let totGen = 0, totPers = 0, persLuis = 0, persWife = 0;
-
-      (expenses || []).forEach((e) => {
-        const amt = Number(e.amount) || 0;
-        const cat = e.cat || 'Otros';
-        const pctL = getLuisPct(e) / 100;
-        if (e.scope === 'Personal') {
-          totPers += amt;
-          byPers[cat] = (byPers[cat] || 0) + amt;
-          persLuis += amt * pctL;
-          persWife += amt * (1 - pctL);
-        } else {
-          totGen += amt;
-          byGen[cat] = (byGen[cat] || 0) + amt;
-        }
-      });
-
-      const grandTotal = totGen + totPers;
-      document.getElementById('chartTotGeneral').textContent = fmt(totGen);
-      document.getElementById('chartPctGeneral').textContent =
-        grandTotal > 0 ? `${Math.round((totGen / grandTotal) * 100)}% del gasto total` : '0% del gasto total';
-      document.getElementById('chartTotPersonal').textContent = fmt(totPers);
-      document.getElementById('chartSubPersonal').textContent = `Luis: ${fmt(persLuis)} | Esposa: ${fmt(persWife)}`;
-
-      renderBars('chartGeneralBars', byGen, totGen, 'bar-general', 'Sin gastos generales (Hogar) registrados este mes.');
-      renderBars('chartPersonalBars', byPers, totPers, 'bar-personal', 'Sin gastos personales registrados este mes.');
-    }
-
-    function renderGoals(libreLuis) {
-      const goals = Array.isArray(db._goals) ? db._goals : [];
-      document.getElementById('goalsSavedTotal').textContent = fmt(goals.reduce((a, g) => a + (Number(g.current) || 0), 0));
-      document.getElementById('goalsTargetTotal').textContent = `Meta total: ${fmt(goals.reduce((a, g) => a + (Number(g.target) || 0), 0))}`;
-      document.getElementById('goalsMonthFree').textContent = fmt(libreLuis);
-      document.getElementById('goalsCount').textContent = goals.length;
-
-      const listEl = document.getElementById('goalsList');
-      if (!goals.length) {
-        listEl.innerHTML = '<p style="color:var(--muted); font-size:0.84rem; text-align:center; padding:12px 0;">Aún no tienes metas creadas.</p>';
-        return;
-      }
-
-      listEl.innerHTML = goals.map((g) => {
-        const cur = Number(g.current) || 0;
-        const tar = Math.max(1, Number(g.target) || 1);
-        const pct = Math.min(100, Math.round((cur / tar) * 100));
-        return `
-          <div class="goal-card">
-            <div class="goal-top"><div class="goal-name">${g.name}</div><div class="goal-pct">${pct}%</div></div>
-            <div class="goal-nums">Ahorrado: <strong>${fmt(cur)}</strong> de ${fmt(g.target)} (Falta: ${fmt(Math.max(0, g.target - cur))})</div>
-            <div class="bar-track"><div class="bar-fill bar-goal" style="width:${pct}%;"></div></div>
-            <div class="goal-actions">
-              <button class="btn-goal add goal-inc" data-id="${g.id}" data-amt="10000" type="button">+$10.000</button>
-              <button class="btn-goal add goal-inc" data-id="${g.id}" data-amt="50000" type="button">+$50.000</button>
-              <button class="btn-goal goal-custom" data-id="${g.id}" type="button">Aporte / Ajuste</button>
-              <button class="btn-goal del goal-del" data-id="${g.id}" type="button">Eliminar</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      listEl.querySelectorAll('.goal-inc').forEach((b) => {
-        b.addEventListener('click', () => {
-          const g = db._goals.find((x) => x.id === b.dataset.id);
-          if (g) { g.current = (Number(g.current) || 0) + Number(b.dataset.amt); saveDB(); renderAll(); }
-        });
-      });
-      listEl.querySelectorAll('.goal-custom').forEach((b) => {
-        b.addEventListener('click', () => {
-          const g = db._goals.find((x) => x.id === b.dataset.id);
-          if (g) {
-            const val = prompt(`Total acumulado para "${g.name}" (actual: ${g.current || 0}):`, String(g.current || 0));
-            if (val !== null && !Number.isNaN(Number(val)) && Number(val) >= 0) { g.current = Number(val); saveDB(); renderAll(); }
-          }
-        });
-      });
-      listEl.querySelectorAll('.goal-del').forEach((b) => {
-        b.addEventListener('click', () => {
-          if (!confirm('¿Eliminar esta meta?')) return;
-          db._goals = db._goals.filter((x) => x.id !== b.dataset.id);
-          saveDB();
-          renderAll();
-        });
-      });
-    }
-
-    function renderList(expenses) {
-      const fOwner = document.getElementById('filterOwner').value;
-      const fPay = document.getElementById('filterPay').value;
-      const fScope = document.getElementById('filterScope').value;
-
-      const filtered = (expenses || []).filter((e) => {
-        if (fOwner === 'SHARED' && (e.split === '100_luis' || e.split === '100_wife')) return false;
-        if (fOwner === 'LUIS' && e.split !== '100_luis') return false;
-        if (fOwner === 'WIFE' && e.split !== '100_wife') return false;
-        if (fPay !== 'ALL' && (e.pay || 'Transferencia') !== fPay) return false;
-        if (fScope !== 'ALL' && (e.scope || 'Hogar') !== fScope) return false;
-        return true;
-      });
-
-      document.getElementById('countItems').textContent = filtered.length;
-      const listEl = document.getElementById('expenseList');
-      if (!filtered.length) {
-        listEl.innerHTML = '<p style="color:var(--muted); font-size:0.85rem; text-align:center; padding:18px 0;">No hay movimientos con los filtros seleccionados.</p>';
-        return;
-      }
-
-      listEl.innerHTML = filtered.map((exp) => {
-        const pctL = getLuisPct(exp);
-        const amtL = exp.amount * (pctL / 100);
-        const amtW = exp.amount - amtL;
-
-        let ownerBadge = `<span class="badge b-shared">Compartido ${pctL}/${100 - pctL}</span>`;
-        if (pctL === 100) ownerBadge = `<span class="badge b-luis">100% Luis</span>`;
-        if (pctL === 0) ownerBadge = `<span class="badge b-wife">100% Esposa</span>`;
-
-        const payClass = exp.pay === 'Tarjeta de Crédito' ? 'b-tc' : 'b-pay';
-        const scopeBadge = exp.scope === 'Personal' ? `<span class="badge b-pers">Personal</span>` : '';
-
-        return `
-          <div class="expense-item">
-            <div>
-              <div class="expense-title">${exp.desc}</div>
-              <div class="expense-meta">
-                ${ownerBadge}
-                <span class="badge ${payClass}">${exp.pay || 'Transferencia'}</span>
-                <span class="badge b-pay">${exp.cat}</span>
-                ${scopeBadge}
-              </div>
-            </div>
-            <div class="expense-right">
-              <div class="expense-amount">${fmt(exp.amount)}</div>
-              <div class="expense-split">L: ${fmt(amtL)} | E: ${fmt(amtW)}</div>
-              <div class="expense-actions">
-                <button class="icon-btn edit-exp-btn" data-id="${exp.id}" type="button">✏️</button>
-                <button class="icon-btn del-exp-btn" data-id="${exp.id}" type="button">🗑️</button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      listEl.querySelectorAll('.edit-exp-btn').forEach((b) => {
-        b.addEventListener('click', () => {
-          const exp = ensureMonth(monthPicker.value).expenses.find((x) => x.id === b.dataset.id);
-          if (!exp) return;
-          editingId = exp.id;
-          document.getElementById('formTitle').textContent = 'Editar Gasto';
-          document.getElementById('saveExpBtn').textContent = 'Actualizar Gasto';
-          document.getElementById('cancelEditBtn').classList.remove('hidden');
-          document.getElementById('expDesc').value = exp.desc;
-          document.getElementById('expAmount').value = exp.amount;
-          document.getElementById('expCat').value = exp.cat;
-          selectSplitType(exp.split);
-          if (exp.split === 'custom') { document.getElementById('customLuisPct').value = exp.luisPct; updateCustomPctLabel(); }
-          selectPayMethod(exp.pay || 'Transferencia');
-          selectScope(exp.scope || 'Hogar');
-          switchTab('agregar');
-        });
-      });
-
-      listEl.querySelectorAll('.del-exp-btn').forEach((b) => {
-        b.addEventListener('click', () => {
-          if (!confirm('¿Eliminar este gasto?')) return;
-          const m = ensureMonth(monthPicker.value);
-          m.expenses = m.expenses.filter((x) => x.id !== b.dataset.id);
-          saveDB();
-          renderAll();
-        });
-      });
-    }
-
-    function renderAll() {
-      const data = ensureMonth(monthPicker.value);
-      document.getElementById('incLuis').value = data.incLuis;
-      document.getElementById('incWife').value = data.incWife;
-      document.getElementById('targetPocket').value = data.targetPocket;
-
-      const totalInc = (Number(data.incLuis) || 0) + (Number(data.incWife) || 0);
-      const shareLuis = totalInc > 0 ? (Number(data.incLuis) || 0) / totalInc : 0.5;
-      const shareWife = 1 - shareLuis;
-      document.getElementById('ratioIngresoLabel').textContent =
-        `Peso ingresos: ${Math.round(shareLuis * 100)}% Luis / ${Math.round(shareWife * 100)}% Esposa`;
-
-      let totHogar = 0, totPersLuis = 0, totPersWife = 0, luisHogar = 0, wifeHogar = 0;
-      const payStats = {
-        'Transferencia': { total: 0, luis: 0, wife: 0 },
-        'Débito': { total: 0, luis: 0, wife: 0 },
-        'Tarjeta de Crédito': { total: 0, luis: 0, wife: 0 }
-      };
-
-      (data.expenses || []).forEach((exp) => {
-        const pctL = getLuisPct(exp) / 100;
-        const amtL = Number(exp.amount) * pctL;
-        const amtW = Number(exp.amount) - amtL;
-        if (exp.scope === 'Personal') { totPersLuis += amtL; totPersWife += amtW; }
-        else { totHogar += Number(exp.amount); luisHogar += amtL; wifeHogar += amtW; }
-        const pKey = payStats[exp.pay] ? exp.pay : 'Transferencia';
-        payStats[pKey].total += Number(exp.amount);
-        payStats[pKey].luis += amtL;
-        payStats[pKey].wife += amtW;
-      });
-
-      const libreLuis = (Number(data.incLuis) || 0) - (luisHogar + totPersLuis);
-      const libreWife = (Number(data.incWife) || 0) - (wifeHogar + totPersWife);
-      const justoLuis = totHogar * shareLuis;
-      const justoWife = totHogar * shareWife;
-      const diffLuis = luisHogar - justoLuis;
-
-      document.getElementById('totHogar').textContent = fmt(totHogar);
-      document.getElementById('subGastosPers').textContent = `Pers. L: ${fmt(totPersLuis)} | E: ${fmt(totPersWife)}`;
-
-      const luisLibreEl = document.getElementById('luisLibreHoy');
-      luisLibreEl.textContent = fmt(libreLuis);
-      luisLibreEl.className = `stat-val ${libreLuis < (Number(data.targetPocket) || 0) ? 'text-red' : 'text-green'}`;
-      document.getElementById('wifeLibreHoy').textContent = `Esposa libre: ${fmt(libreWife)}`;
-
-      document.getElementById('aporteRealLuis').textContent = fmt(luisHogar);
-      document.getElementById('aporteRealWife').textContent = `Ella aporta hogar: ${fmt(wifeHogar)}`;
-      document.getElementById('aporteJustoLuis').textContent = fmt(justoLuis);
-      document.getElementById('aporteJustoWife').textContent = `Ella debería: ${fmt(justoWife)}`;
-
-      const consejoBox = document.getElementById('consejoBox');
-      if (totHogar === 0) {
-        consejoBox.className = 'alert-box alert-info';
-        consejoBox.innerHTML = 'Agrega los gastos del mes (o usa <strong>Plantilla base</strong> arriba) para calcular el reparto óptimo y cuánto dinero queda en tu bolsillo.';
-      } else if (diffLuis > 15000) {
-        consejoBox.className = 'alert-box alert-warn';
-        consejoBox.innerHTML = `<strong>Desbalance detectado:</strong> Estás aportando <strong>${fmt(diffLuis)}</strong> por encima de tu proporción justa (${Math.round(shareLuis * 100)}%). Aporte sugerido: <strong>${fmt(justoLuis)}</strong>.`;
-      } else {
-        consejoBox.className = 'alert-box alert-ok';
-        consejoBox.innerHTML = `<strong>¡Finanzas equilibradas!</strong> Tu aporte al hogar (${fmt(luisHogar)}) respeta la proporción de ingresos y mantienes <strong>${fmt(libreLuis)}</strong> libres en tu bolsillo.`;
-      }
-
-      document.getElementById('payTransf').textContent = fmt(payStats['Transferencia'].total);
-      document.getElementById('payTransfSub').textContent = `L: ${fmt(payStats['Transferencia'].luis)} | E: ${fmt(payStats['Transferencia'].wife)}`;
-      document.getElementById('payDebito').textContent = fmt(payStats['Débito'].total);
-      document.getElementById('payDebitoSub').textContent = `L: ${fmt(payStats['Débito'].luis)} | E: ${fmt(payStats['Débito'].wife)}`;
-      document.getElementById('payTC').textContent = fmt(payStats['Tarjeta de Crédito'].total);
-      document.getElementById('payTCSub').textContent = `L: ${fmt(payStats['Tarjeta de Crédito'].luis)} | E: ${fmt(payStats['Tarjeta de Crédito'].wife)}`;
-
-      const tcAlert = document.getElementById('tcAlertBox');
-      if (payStats['Tarjeta de Crédito'].total > 0) {
-        tcAlert.classList.remove('hidden');
-        tcAlert.innerHTML = `<strong>Ojo con Tarjeta de Crédito:</strong> Hay <strong>${fmt(payStats['Tarjeta de Crédito'].total)}</strong> pagados con crédito este mes.`;
-      } else {
-        tcAlert.classList.add('hidden');
-      }
-
-      renderList(data.expenses || []);
-      renderCharts(data.expenses || []);
-      renderGoals(libreLuis);
-    }
-
-    document.getElementById('saveGoalBtn').addEventListener('click', () => {
-      const name = document.getElementById('goalName').value.trim();
-      const target = Number(document.getElementById('goalTarget').value);
-      const current = Number(document.getElementById('goalCurrent').value) || 0;
-      if (!name || !target || target <= 0) { alert('Ingresa un nombre y un monto objetivo válido.'); return; }
-      db._goals.push({ id: Date.now().toString(), name, target, current });
-      saveDB();
-      document.getElementById('goalName').value = '';
-      document.getElementById('goalTarget').value = '';
-      document.getElementById('goalCurrent').value = '0';
-      renderAll();
-    });
-
-    monthPicker.addEventListener('change', () => { resetForm(); ensureMonth(monthPicker.value); renderAll(); });
-    ['incLuis', 'incWife', 'targetPocket'].forEach((id) => {
-      document.getElementById(id).addEventListener('change', () => {
-        const d = ensureMonth(monthPicker.value);
-        d.incLuis = Number(document.getElementById('incLuis').value) || 0;
-        d.incWife = Number(document.getElementById('incWife').value) || 0;
-        d.targetPocket = Number(document.getElementById('targetPocket').value) || 0;
-        saveDB();
-        renderAll();
-      });
-    });
-
-    document.getElementById('customLuisPct').addEventListener('input', updateCustomPctLabel);
-    document.getElementById('saveExpBtn').addEventListener('click', saveExpense);
-    document.getElementById('cancelEditBtn').addEventListener('click', resetForm);
-
-    document.getElementById('copyPrevBtn').addEventListener('click', () => {
-      const [y, mo] = monthPicker.value.split('-').map(Number);
-      const prevDate = new Date(y, mo - 2, 1);
-      const prevKey = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`;
-      if (!db[prevKey] || !db[prevKey].expenses.length) { alert(`No hay datos guardados en el mes anterior (${prevKey}).`); return; }
-      const cur = ensureMonth(monthPicker.value);
-      cur.incLuis = db[prevKey].incLuis; cur.incWife = db[prevKey].incWife; cur.targetPocket = db[prevKey].targetPocket;
-      cur.expenses = db[prevKey].expenses.map((e, i) => ({ ...e, id: (Date.now() + i).toString() }));
-      saveDB();
-      renderAll();
-    });
-
-    document.getElementById('templateBtn').addEventListener('click', () => {
-      if (!confirm('¿Cargar plantilla ejemplo con los gastos base del hogar?')) return;
-      const cur = ensureMonth(monthPicker.value);
-      cur.expenses = [
-        { id: '1', desc: 'Arriendo + Gastos Comunes + Servicios', amount: 1150000, cat: 'Vivienda y Servicios', split: '50_50', luisPct: 50, pay: 'Transferencia', scope: 'Hogar' },
-        { id: '2', desc: 'Mensualidad Colegio Niña', amount: 450000, cat: 'Colegio Niña', split: '50_50', luisPct: 50, pay: 'Transferencia', scope: 'Hogar' },
-        { id: '3', desc: 'Supermercado y Comida del Mes', amount: 550000, cat: 'Supermercado y Comida', split: '50_50', luisPct: 50, pay: 'Débito', scope: 'Hogar' },
-        { id: '4', desc: 'Bencina y TAG mensual', amount: 350000, cat: 'Auto (Bencina/TAG/Mant.)', split: '70_30', luisPct: 70, pay: 'Débito', scope: 'Hogar' }
-      ];
-      saveDB();
-      renderAll();
-    });
-
-    ['filterOwner', 'filterPay', 'filterScope'].forEach((id) => document.getElementById(id).addEventListener('change', renderAll));
-
-    document.getElementById('waBtn').addEventListener('click', () => {
-      const data = ensureMonth(monthPicker.value);
-      let totHogar = 0, luisHogar = 0, wifeHogar = 0, tcTotal = 0;
-      (data.expenses || []).forEach((e) => {
-        const l = e.amount * (getLuisPct(e) / 100);
-        if (e.scope !== 'Personal') { totHogar += e.amount; luisHogar += l; wifeHogar += (e.amount - l); }
-        if (e.pay === 'Tarjeta de Crédito') tcTotal += e.amount;
-      });
-      const text = `📊 *Resumen Finanzas Hogar (${monthPicker.value})*\n• Gasto Total Hogar: ${fmt(totHogar)}\n• Aporte Luis: ${fmt(luisHogar)}\n• Aporte Esposa: ${fmt(wifeHogar)}\n• Pagado con Tarjeta Crédito: ${fmt(tcTotal)}`;
-      if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => alert('Resumen copiado para WhatsApp.'));
-    });
-
-    document.getElementById('csvBtn').addEventListener('click', () => {
-      const data = ensureMonth(monthPicker.value);
-      const rows = [['Mes', 'Concepto', 'Categoria', 'Alcance', 'Reparto', 'Metodo_Pago', 'Total', 'Luis', 'Esposa']];
-      (data.expenses || []).forEach((e) => {
-        const pctL = getLuisPct(e), l = Math.round(e.amount * (pctL / 100));
-        rows.push([monthPicker.value, `"${e.desc}"`, `"${e.cat}"`, e.scope, `${pctL}/${100 - pctL}`, `"${e.pay}"`, e.amount, l, e.amount - l]);
-      });
-      const blob = new Blob([rows.map((r) => r.join(';')).join('\n')], { type: 'text/csv;charset=utf-8;' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `finanzas_hogar_${monthPicker.value}.csv`; a.click();
-    });
-
-    document.getElementById('exportJsonBtn').addEventListener('click', () => {
-      const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'respaldo_finanzas_hogar.json'; a.click();
-    });
-
-    document.getElementById('importJsonBtn').addEventListener('click', () => document.getElementById('importJsonInput').click());
-    document.getElementById('importJsonInput').addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try { db = JSON.parse(e.target.result); saveDB(); renderAll(); alert('Respaldo restaurado.'); }
-        catch (_) { alert('Archivo JSON inválido.'); }
-      };
-      reader.readAsText(file);
-    });
-
-    let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'inline-block'; });
-    installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; installBtn.style.display = 'none';
-    });
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
-    }
-
-    switchTab('resumen');
-    renderAll();
-  })();
+ // Enlazar todos los eventos después de que existe el contenido HTML.
+  document.querySelectorAll('nav [data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+  $('monthPicker').value=currentMonth;$('monthPicker').addEventListener('change',e=>{if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(e.target.value))return;currentMonth=e.target.value;resetForm();fillMonth()});
+  for(const [id,key] of [['incLuis','incomeLuis'],['incWife','incomeWife'],['targetPocket','targetPocket']])$(id).addEventListener('input',e=>{const n=Number(e.target.value);if(Number.isFinite(n)&&n>=0){monthData()[key]=nat(n);save();render()}});
+  document.querySelectorAll('#splitTypeChips [data-val]').forEach(b=>b.addEventListener('click',()=>{chooseSplit(b.dataset.val);if(scope==='Personal' && splitPct()!==0 && splitPct()!==100){chooseScope('Hogar');toast('Los repartos compartidos se registran como gastos del hogar.')}}));
+  document.querySelectorAll('#scopeChips [data-val]').forEach(b=>b.addEventListener('click',()=>chooseScope(b.dataset.val)));
+  $('paidBy').addEventListener('change',()=>{if(scope==='Personal')chooseSplit(val('paidBy')==='LUIS'?'100_luis':'100_wife')});
+  $('customLuisPct').addEventListener('input',updateCustom);$('saveExpBtn').addEventListener('click',saveExpense);$('cancelEditBtn').addEventListener('click',resetForm);
+  $('expenseList').addEventListener('click',e=>{const b=e.target.closest('button[data-action]');if(!b)return;if(b.dataset.action==='edit')editExpense(b.dataset.id);else deleteExpense(b.dataset.id)});
+  ['filterOwner','filterPay','filterScope'].forEach(id=>$(id).addEventListener('change',()=>renderExpenses(totals())));
+  $('saveGoalBtn').addEventListener('click',saveGoal);$('goalsList').addEventListener('click',e=>{const b=e.target.closest('button[data-goal]');if(b)modifyGoal(b.dataset.goal,b.dataset.id)});
+  $('copyPrevBtn').addEventListener('click',copyPrevious);$('templateBtn').addEventListener('click',makeTemplate);$('csvBtn').addEventListener('click',downloadCSV);$('waBtn').addEventListener('click',sendWhatsApp);
+  $('exportJsonBtn').addEventListener('click',downloadJSON);$('importJsonBtn').addEventListener('click',()=>$('importJsonInput').click());$('importJsonInput').addEventListener('change',e=>restoreJSON(e.target.files[0]));
+  let deferredPrompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('installBtn').style.display='block'});$('installBtn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$('installBtn').style.display='none'});
+  if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('SW:',err));
+  load();fillMonth();showTab('resumen');
+})();
 </script>
 </body>
 </html>
