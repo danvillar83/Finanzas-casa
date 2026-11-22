@@ -49,6 +49,7 @@
       background: #1e293b; color: #e2e8f0; border: 1px solid #334155;
       padding: 7px 10px; border-radius: 10px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
     }
+    #installBtn { background: var(--accent); color: #fff; border-color: var(--accent); display: none; }
 
     .container { max-width: 780px; margin: 0 auto; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
     .card {
@@ -125,7 +126,7 @@
     .bar-row { margin-bottom: 11px; }
     .bar-head { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; gap: 8px; }
     .bar-track { width: 100%; height: 11px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 999px; }
+    .bar-fill { height: 100%; border-radius: 999px; transition: width 0.25s ease; }
     .bar-general { background: var(--blue); }
     .bar-personal { background: var(--purple); }
     .bar-goal { background: var(--accent); }
@@ -163,7 +164,8 @@
 
 <header>
   <div class="header-top">
-    <h1>Finanzas del Hogar <span class="pwa-badge">PWA v8</span></h1>
+    <h1>Finanzas del Hogar <span class="pwa-badge" id="offlineStatus">PWA v8</span></h1>
+    <button class="btn-mini" id="installBtn" type="button">+ Instalar App</button>
   </div>
   <div class="month-bar">
     <input type="month" id="monthPicker" />
@@ -175,6 +177,7 @@
 </header>
 
 <main class="container">
+  <!-- 1. BALANCE -->
   <section id="sec-resumen" class="tab-section">
     <div class="card">
       <div class="card-title">
@@ -182,42 +185,93 @@
         <span style="font-size:0.75rem; color:var(--muted);" id="ratioIngresoLabel"></span>
       </div>
       <div class="grid-2">
-        <div><label for="incLuis">Ingreso Luis ($)</label><input type="number" id="incLuis" step="10000" /></div>
-        <div><label for="incWife">Ingreso Esposa ($)</label><input type="number" id="incWife" step="10000" /></div>
+        <div>
+          <label for="incLuis">Ingreso Luis ($)</label>
+          <input type="number" id="incLuis" step="10000" />
+        </div>
+        <div>
+          <label for="incWife">Ingreso Esposa ($)</label>
+          <input type="number" id="incWife" step="10000" />
+        </div>
       </div>
-      <div style="margin-top:10px;"><label for="targetPocket">Meta mínima libre en tu bolsillo ($)</label><input type="number" id="targetPocket" step="10000" /></div>
+      <div style="margin-top:10px;">
+        <label for="targetPocket">Meta mínima libre en tu bolsillo a fin de mes ($)</label>
+        <input type="number" id="targetPocket" step="10000" />
+      </div>
     </div>
 
     <div class="card">
       <div class="card-title"><span>2. Balance Real vs. Reparto Justo</span></div>
       <div class="grid-2">
-        <div class="stat-box"><div class="stat-label">Gasto Total Hogar</div><div class="stat-val" id="totHogar">$0</div><div class="stat-sub" id="subGastosPers">Pers: $0</div></div>
-        <div class="stat-box"><div class="stat-label">Te queda libre hoy</div><div class="stat-val" id="luisLibreHoy">$0</div><div class="stat-sub" id="wifeLibreHoy">Esposa libre: $0</div></div>
+        <div class="stat-box">
+          <div class="stat-label">Gasto Total Hogar</div>
+          <div class="stat-val" id="totHogar">$0</div>
+          <div class="stat-sub" id="subGastosPers">Pers: $0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Te queda libre hoy</div>
+          <div class="stat-val" id="luisLibreHoy">$0</div>
+          <div class="stat-sub" id="wifeLibreHoy">Esposa libre: $0</div>
+        </div>
       </div>
+
       <div class="grid-2" style="margin-top:10px;">
-        <div class="stat-box"><div class="stat-label">Aporte Real Actual</div><div class="stat-val text-blue" id="aporteRealLuis">$0</div><div class="stat-sub" id="aporteRealWife">Ella aporta: $0</div></div>
-        <div class="stat-box"><div class="stat-label">Aporte Justo Proporcional</div><div class="stat-val text-green" id="aporteJustoLuis">$0</div><div class="stat-sub" id="aporteJustoWife">Ella debería: $0</div></div>
+        <div class="stat-box">
+          <div class="stat-label">Aporte Real Actual</div>
+          <div class="stat-val text-blue" id="aporteRealLuis">$0</div>
+          <div class="stat-sub" id="aporteRealWife">Ella aporta: $0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Aporte Justo Proporcional</div>
+          <div class="stat-val text-green" id="aporteJustoLuis">$0</div>
+          <div class="stat-sub" id="aporteJustoWife">Ella debería: $0</div>
+        </div>
       </div>
-      <div id="consejoBox" class="alert-box alert-info"></div>
+
+      <div id="consejoBox" class="alert-box alert-info">Cargando análisis...</div>
     </div>
 
     <div class="card">
       <div class="card-title"><span>3. Desglose por Método de Pago</span></div>
       <div class="grid-3">
-        <div class="stat-box"><div class="stat-label">Transferencia</div><div class="stat-val" id="payTransf">$0</div><div class="stat-sub" id="payTransfSub"></div></div>
-        <div class="stat-box"><div class="stat-label">Débito</div><div class="stat-val" id="payDebito">$0</div><div class="stat-sub" id="payDebitoSub"></div></div>
-        <div class="stat-box"><div class="stat-label">T. Crédito</div><div class="stat-val text-amber" id="payTC">$0</div><div class="stat-sub" id="payTCSub"></div></div>
+        <div class="stat-box">
+          <div class="stat-label">Transferencia</div>
+          <div class="stat-val" id="payTransf">$0</div>
+          <div class="stat-sub" id="payTransfSub">L: $0 | E: $0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Débito</div>
+          <div class="stat-val" id="payDebito">$0</div>
+          <div class="stat-sub" id="payDebitoSub">L: $0 | E: $0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">T. Crédito</div>
+          <div class="stat-val text-amber" id="payTC">$0</div>
+          <div class="stat-sub" id="payTCSub">L: $0 | E: $0</div>
+        </div>
       </div>
       <div id="tcAlertBox" class="alert-box alert-warn hidden"></div>
     </div>
   </section>
 
+  <!-- 2. REGISTRAR -->
   <section id="sec-agregar" class="tab-section hidden">
     <div class="card">
-      <div class="card-title"><span id="formTitle">Registrar Nuevo Gasto</span><button class="btn-secondary hidden" id="cancelEditBtn" type="button">Cancelar</button></div>
-      <div style="margin-bottom:10px;"><label for="expDesc">Concepto o descripción</label><input type="text" id="expDesc" placeholder="Ej: Supermercado, Médico, Bencina..." /></div>
+      <div class="card-title">
+        <span id="formTitle">Registrar Nuevo Gasto</span>
+        <button class="btn-secondary hidden" id="cancelEditBtn" type="button">Cancelar edición</button>
+      </div>
+
+      <div style="margin-bottom:10px;">
+        <label for="expDesc">Concepto o descripción</label>
+        <input type="text" id="expDesc" placeholder="Ej: Arriendo, Supermercado, Cambio de aceite, Médico..." />
+      </div>
+
       <div class="grid-2" style="margin-bottom:10px;">
-        <div><label for="expAmount">Monto total ($ CLP)</label><input type="number" id="expAmount" /></div>
+        <div>
+          <label for="expAmount">Monto total ($ CLP)</label>
+          <input type="number" id="expAmount" placeholder="Ej: 85000" />
+        </div>
         <div>
           <label for="expCat">Categoría</label>
           <select id="expCat">
@@ -231,6 +285,7 @@
           </select>
         </div>
       </div>
+
       <div style="margin-bottom:10px;">
         <label>¿Quién asume este gasto?</label>
         <div class="chip-group" id="splitTypeChips">
@@ -241,41 +296,66 @@
           <div class="chip" data-val="custom">% Personalizado</div>
         </div>
       </div>
+
       <div id="customSplitBox" class="hidden" style="margin-bottom:10px; background:var(--surface-2); padding:10px; border-radius:10px;">
-        <label for="customLuisPct">Luis: <strong id="customPctLabel">50%</strong> (Esposa: <span id="customWifePctLabel">50%</span>)</label>
+        <label for="customLuisPct">Porcentaje que paga Luis: <strong id="customPctLabel">50%</strong> (Esposa: <span id="customWifePctLabel">50%</span>)</label>
         <input type="range" id="customLuisPct" min="0" max="100" value="50" style="width:100%;" />
       </div>
+
       <div style="margin-bottom:10px;">
-        <label>Método de pago</label>
+        <label>Método de pago utilizado</label>
         <div class="chip-group" id="payMethodChips">
           <div class="chip active-pay" data-val="Transferencia">Transferencia</div>
           <div class="chip" data-val="Débito">Débito</div>
           <div class="chip" data-val="Tarjeta de Crédito">Tarjeta de Crédito</div>
         </div>
       </div>
+
       <div style="margin-bottom:6px;">
-        <label>Alcance</label>
+        <label>Alcance del gasto</label>
         <div class="chip-group" id="scopeChips">
-          <div class="chip active" data-val="Hogar">Gasto del Hogar</div>
-          <div class="chip" data-val="Personal">Gasto Personal</div>
+          <div class="chip active" data-val="Hogar">Gasto del Hogar / Familia</div>
+          <div class="chip" data-val="Personal">Gasto Personal Individual</div>
         </div>
       </div>
+
       <button class="btn-primary" id="saveExpBtn" type="button">Guardar Gasto</button>
     </div>
   </section>
 
+  <!-- 3. MOVIMIENTOS -->
   <section id="sec-lista" class="tab-section hidden">
     <div class="card">
       <div class="card-title">
-        <span>Movimientos (<span id="countItems">0</span>)</span>
-        <div style="display:flex; gap:6px;"><button class="btn-secondary" id="waBtn" type="button">WhatsApp</button><button class="btn-secondary" id="csvBtn" type="button">CSV</button></div>
+        <span>Movimientos del Mes (<span id="countItems">0</span>)</span>
+        <div style="display:flex; gap:6px;">
+          <button class="btn-secondary" id="waBtn" type="button">WhatsApp</button>
+          <button class="btn-secondary" id="csvBtn" type="button">CSV</button>
+        </div>
       </div>
+
       <div class="grid-3" style="margin-bottom:10px;">
-        <select id="filterOwner"><option value="ALL">Todos</option><option value="SHARED">Compartidos</option><option value="LUIS">100% Luis</option><option value="WIFE">100% Esposa</option></select>
-        <select id="filterPay"><option value="ALL">Todo Pago</option><option value="Transferencia">Transferencia</option><option value="Débito">Débito</option><option value="Tarjeta de Crédito">T. Crédito</option></select>
-        <select id="filterScope"><option value="ALL">Hogar + Pers.</option><option value="Hogar">Solo Hogar</option><option value="Personal">Solo Personal</option></select>
+        <select id="filterOwner">
+          <option value="ALL">Todos (Responsable)</option>
+          <option value="SHARED">Compartidos</option>
+          <option value="LUIS">100% Luis</option>
+          <option value="WIFE">100% Esposa</option>
+        </select>
+        <select id="filterPay">
+          <option value="ALL">Todos (Pago)</option>
+          <option value="Transferencia">Transferencia</option>
+          <option value="Débito">Débito</option>
+          <option value="Tarjeta de Crédito">T. Crédito</option>
+        </select>
+        <select id="filterScope">
+          <option value="ALL">Hogar + Personal</option>
+          <option value="Hogar">Solo Hogar</option>
+          <option value="Personal">Solo Personal</option>
+        </select>
       </div>
+
       <div id="expenseList"></div>
+
       <div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--border); display:flex; gap:8px; flex-wrap:wrap;">
         <button class="btn-secondary" id="exportJsonBtn" type="button">Respaldar JSON</button>
         <button class="btn-secondary" id="importJsonBtn" type="button">Restaurar JSON</button>
@@ -284,36 +364,76 @@
     </div>
   </section>
 
+  <!-- 4. GRÁFICOS -->
   <section id="sec-graficos" class="tab-section hidden">
     <div class="card">
-      <div class="card-title"><span>General (Hogar) vs. Personal</span></div>
+      <div class="card-title"><span>Resumen: General (Hogar) vs. Personal</span></div>
       <div class="grid-2">
-        <div class="stat-box"><div class="stat-label">Total General</div><div class="stat-val text-blue" id="chartTotGeneral">$0</div><div class="stat-sub" id="chartPctGeneral"></div></div>
-        <div class="stat-box"><div class="stat-label">Total Personal</div><div class="stat-val" style="color:var(--purple);" id="chartTotPersonal">$0</div><div class="stat-sub" id="chartSubPersonal"></div></div>
+        <div class="stat-box">
+          <div class="stat-label">Total General (Hogar)</div>
+          <div class="stat-val text-blue" id="chartTotGeneral">$0</div>
+          <div class="stat-sub" id="chartPctGeneral">0% del total</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Total Personal</div>
+          <div class="stat-val" style="color:var(--purple);" id="chartTotPersonal">$0</div>
+          <div class="stat-sub" id="chartSubPersonal">Luis: $0 | Esposa: $0</div>
+        </div>
       </div>
     </div>
-    <div class="card"><div class="card-title"><span>Categorías — General (Hogar)</span></div><div id="chartGeneralBars"></div></div>
-    <div class="card"><div class="card-title"><span>Categorías — Personal</span></div><div id="chartPersonalBars"></div></div>
+
+    <div class="card">
+      <div class="card-title"><span>En qué se gasta más — General (Hogar)</span></div>
+      <div id="chartGeneralBars"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>En qué se gasta más — Personal</span></div>
+      <div id="chartPersonalBars"></div>
+    </div>
   </section>
 
+  <!-- 5. METAS DE AHORRO -->
   <section id="sec-metas" class="tab-section hidden">
     <div class="card">
-      <div class="card-title"><span>Ahorro por Metas</span></div>
+      <div class="card-title"><span>Resumen de Ahorro por Metas</span></div>
       <div class="grid-2">
-        <div class="stat-box"><div class="stat-label">Ahorrado en Metas</div><div class="stat-val text-green" id="goalsSavedTotal">$0</div><div class="stat-sub" id="goalsTargetTotal"></div></div>
-        <div class="stat-box"><div class="stat-label">Libre estimado este mes</div><div class="stat-val text-blue" id="goalsMonthFree">$0</div><div class="stat-sub">Mes actual</div></div>
+        <div class="stat-box">
+          <div class="stat-label">Total Ahorrado en Metas</div>
+          <div class="stat-val text-green" id="goalsSavedTotal">$0</div>
+          <div class="stat-sub" id="goalsTargetTotal">Meta total: $0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Tu saldo libre estimado este mes</div>
+          <div class="stat-val text-blue" id="goalsMonthFree">$0</div>
+          <div class="stat-sub">Referencia del mes seleccionado</div>
+        </div>
       </div>
     </div>
+
     <div class="card">
-      <div class="card-title"><span>Nueva Meta</span></div>
-      <div style="margin-bottom:10px;"><label for="goalName">Nombre</label><input type="text" id="goalName" placeholder="Ej: Fondo emergencia" /></div>
+      <div class="card-title"><span>Nueva Meta de Ahorro</span></div>
+      <div style="margin-bottom:10px;">
+        <label for="goalName">Nombre de la meta</label>
+        <input type="text" id="goalName" placeholder="Ej: Fondo de emergencia, Mantención auto, Paseos..." />
+      </div>
       <div class="grid-2">
-        <div><label for="goalTarget">Meta ($ CLP)</label><input type="number" id="goalTarget" /></div>
-        <div><label for="goalCurrent">Inicial ($ CLP)</label><input type="number" id="goalCurrent" value="0" /></div>
+        <div>
+          <label for="goalTarget">Monto objetivo ($ CLP)</label>
+          <input type="number" id="goalTarget" placeholder="Ej: 500000" />
+        </div>
+        <div>
+          <label for="goalCurrent">Monto inicial ahorrado ($ CLP)</label>
+          <input type="number" id="goalCurrent" placeholder="0" value="0" />
+        </div>
       </div>
       <button class="btn-primary" id="saveGoalBtn" type="button">Crear Meta</button>
     </div>
-    <div class="card"><div class="card-title"><span>Mis Metas (<span id="goalsCount">0</span>)</span></div><div id="goalsList"></div></div>
+
+    <div class="card">
+      <div class="card-title"><span>Mis Metas (<span id="goalsCount">0</span>)</span></div>
+      <div id="goalsList"></div>
+    </div>
   </section>
 </main>
 
@@ -321,55 +441,3 @@
   <button class="tab-btn active" data-tab="resumen" type="button"><span>📊</span><span>Balance</span></button>
   <button class="tab-btn" data-tab="agregar" type="button"><span>➕</span><span>Registrar</span></button>
   <button class="tab-btn" data-tab="lista" type="button"><span>📋</span><span>Movimientos</span></button>
-  <button class="tab-btn" data-tab="graficos" type="button"><span>📈</span><span>Gráficos</span></button>
-  <button class="tab-btn" data-tab="metas" type="button"><span>🎯</span><span>Metas</span></button>
-</nav>
-
-<script>
-(function () {
-  const STORAGE_KEY = 'finanzas_hogar_pwa_v8';
-  const LEGACY_KEYS = ['finanzas_hogar_pwa_v6', 'finanzas_hogar_pwa_v5', 'finanzas_hogar_pwa_v3', 'finanzas_hogar_pwa_v2', 'finanzas_hogar_pwa_v1'];
-  let db = {};
-  try { db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {}; } catch (_) { db = {}; }
-
-  if (!Object.keys(db).length) {
-    for (const k of LEGACY_KEYS) {
-      try {
-        const old = JSON.parse(localStorage.getItem(k) || 'null');
-        if (old && typeof old === 'object' && Object.keys(old).length) {
-          db = old;
-          break;
-        }
-      } catch (_) {}
-    }
-  }
-
-  if (!Array.isArray(db._goals)) {
-    db._goals = [{ id: 'g1', name: 'Colchón / Imprevistos', target: 350000, current: 0 }];
-  }
-
-  let editingId = null, currentSplit = '50_50', currentPay = 'Transferencia', currentScope = 'Hogar';
-  const monthPicker = document.getElementById('monthPicker');
-  const now = new Date();
-  monthPicker.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-
-  function saveDB() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } catch (_) {}
-  }
-
-  function ensureMonth(m) {
-    const k = m || monthPicker.value || '2026-11';
-    if (!db[k]) {
-      db[k] = { incLuis: 1450000, incWife: 1850000, targetPocket: 350000, expenses: [] };
-      saveDB();
-    }
-    return db[k];
-  }
-
-  function fmt(n) {
-    return '$' + Math.round(Number(n) || 0).toLocaleString('es-CL');
-  }
-
-  function getLuisPct(e) {
-    if (e.split === '50_50') return 50;
-    if (e.split === '70_3
