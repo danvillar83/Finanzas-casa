@@ -2,480 +2,274 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0f172a" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Finanzas Hogar" />
   <link rel="manifest" href="./manifest.json" />
-  <title>Finanzas del Hogar - PWA</title>
+  <title>Finanzas del Hogar</title>
   <style>
-    :root {
-      --bg: #f1f5f9;
-      --surface: #ffffff;
-      --surface-2: #f8fafc;
-      --primary: #0f172a;
-      --accent: #059669;
-      --accent-soft: #d1fae5;
-      --blue: #2563eb;
-      --blue-soft: #dbeafe;
-      --purple: #7c3aed;
-      --purple-soft: #ede9fe;
-      --amber: #d97706;
-      --amber-soft: #fef3c7;
-      --danger: #dc2626;
-      --danger-soft: #fee2e2;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --radius: 14px;
-      --shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: #f1f5f9; color: #0f172a; padding-bottom: 84px; }
+    header { background: #0f172a; color: #fff; padding: 14px 16px; position: sticky; top: 0; z-index: 10; }
+    header h1 { font-size: 1.05rem; }
+    .sub-bar { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+    input[type="month"], input[type="text"], input[type="number"], select {
+      padding: 9px 10px; border-radius: 9px; border: 1px solid #cbd5e1; font-size: 0.92rem; background: #fff; color: #0f172a;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 96px; -webkit-tap-highlight-color: transparent; }
-
-    header {
-      background: var(--primary);
-      color: #fff;
-      padding: 16px 16px 14px;
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-    }
-    .header-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; max-width: 780px; margin: 0 auto; }
-    header h1 { font-size: 1.08rem; font-weight: 700; letter-spacing: -0.2px; }
-    .pwa-badge { font-size: 0.7rem; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; padding: 3px 8px; border-radius: 999px; font-weight: 600; }
-
-    .month-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; max-width: 780px; margin: 10px auto 0; flex-wrap: wrap; }
-    .month-bar input[type="month"] {
-      background: #1e293b; color: #fff; border: 1px solid #334155;
-      padding: 7px 10px; border-radius: 10px; font-size: 0.9rem; font-weight: 600;
-    }
-    .btn-mini {
-      background: #1e293b; color: #e2e8f0; border: 1px solid #334155;
-      padding: 7px 10px; border-radius: 10px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
-    }
-    .btn-mini:active { transform: scale(0.97); }
-    #installBtn { background: var(--accent); color: #fff; border-color: var(--accent); display: none; }
-
-    .container { max-width: 780px; margin: 0 auto; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
-
-    .card {
-      background: var(--surface); border-radius: var(--radius); padding: 15px;
-      box-shadow: var(--shadow); border: 1px solid var(--border);
-    }
-    .card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-
-    label { display: block; font-size: 0.76rem; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
-    input[type="text"], input[type="number"], select {
-      width: 100%; padding: 10px 11px; border: 1px solid var(--border); border-radius: 10px;
-      font-size: 0.92rem; background: var(--surface-2); color: var(--text); outline: none;
-    }
-    input:focus, select:focus { border-color: var(--blue); background: #fff; }
-
-    .stat-box {
-      background: var(--surface-2); border: 1px solid var(--border); border-radius: 11px; padding: 10px;
-    }
-    .stat-label { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
-    .stat-val { font-size: 1.05rem; font-weight: 800; margin-top: 2px; }
-    .stat-sub { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-    .text-green { color: var(--accent); }
-    .text-red { color: var(--danger); }
-    .text-blue { color: var(--blue); }
-    .text-amber { color: var(--amber); }
-
-    .alert-box {
-      border-radius: 11px; padding: 11px 12px; font-size: 0.82rem; line-height: 1.4; margin-top: 10px;
-    }
-    .alert-info { background: var(--blue-soft); color: #1e3a8a; border: 1px solid #bfdbfe; }
-    .alert-warn { background: var(--amber-soft); color: #78350f; border: 1px solid #fde68a; }
-    .alert-ok { background: var(--accent-soft); color: #064e3b; border: 1px solid #a7f3d0; }
-
-    .chip-group { display: flex; gap: 6px; flex-wrap: wrap; }
-    .chip {
-      flex: 1; min-width: 88px; text-align: center; padding: 9px 8px; border-radius: 10px;
-      border: 1.5px solid var(--border); background: var(--surface-2); font-size: 0.8rem;
-      font-weight: 600; cursor: pointer; user-select: none; transition: 0.15s;
-    }
-    .chip.active { border-color: var(--primary); background: var(--primary); color: #fff; }
-    .chip.active-pay { border-color: var(--blue); background: var(--blue-soft); color: #1e40af; }
-
-    .btn-primary {
-      width: 100%; background: var(--accent); color: #fff; border: none; padding: 12px;
-      border-radius: 11px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 10px;
-    }
-    .btn-primary:active { transform: scale(0.99); }
-    .btn-secondary {
-      background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
-      padding: 9px 12px; border-radius: 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer;
-    }
-
-    .expense-item {
-      border: 1px solid var(--border); border-radius: 12px; padding: 11px;
-      display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
-      background: #fff; margin-bottom: 8px;
-    }
-    .expense-title { font-weight: 700; font-size: 0.9rem; }
-    .expense-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
-    .badge {
-      font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 6px;
-    }
-    .b-shared { background: var(--blue-soft); color: #1e40af; }
-    .b-luis { background: var(--accent-soft); color: #065f46; }
-    .b-wife { background: var(--purple-soft); color: #5b21b6; }
-    .b-pay { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
-    .b-tc { background: var(--amber-soft); color: #92400e; }
-    .b-pers { background: #fce7f3; color: #9d174d; }
-
-    .expense-right { text-align: right; min-width: 105px; }
-    .expense-amount { font-weight: 800; font-size: 0.96rem; }
-    .expense-split { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-    .expense-actions { margin-top: 6px; display: flex; gap: 6px; justify-content: flex-end; }
-    .icon-btn {
-      background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px;
-      padding: 4px 8px; font-size: 0.75rem; cursor: pointer;
-    }
-
-    .tabs {
-      position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
-      border-top: 1px solid var(--border); display: flex; justify-content: space-around;
-      padding: 10px 6px calc(10px + env(safe-area-inset-bottom)); z-index: 99;
-    }
-    .tab-btn {
-      flex: 1; background: none; border: none; font-size: 0.78rem; font-weight: 700;
-      color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer;
-      touch-action: manipulation;
-    }
-    .tab-btn.active { color: var(--primary); }
-    .hidden { display: none !important; }
+    input[type="month"] { background: #1e293b; color: #fff; border-color: #334155; }
+    .btn-top { background: #1e293b; color: #fff; border: 1px solid #334155; padding: 8px 10px; border-radius: 9px; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 14px; }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+    .card h2 { font-size: 0.95rem; margin-bottom: 10px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    label { display: block; font-size: 0.76rem; color: #475569; font-weight: 600; margin-bottom: 4px; }
+    .box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; }
+    .box .k { font-size: 0.72rem; color: #64748b; }
+    .box .v { font-size: 1.02rem; font-weight: 800; margin-top: 2px; }
+    .box .s { font-size: 0.72rem; color: #64748b; margin-top: 2px; }
+    .msg { margin-top: 10px; padding: 10px; border-radius: 10px; background: #eff6ff; color: #1e3a8a; font-size: 0.84rem; line-height: 1.4; }
+    .btn-save { width: 100%; margin-top: 12px; padding: 12px; border: none; border-radius: 10px; background: #059669; color: #fff; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+    .item { border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; gap: 8px; }
+    .del { background: #fee2e2; color: #991b1b; border: none; border-radius: 7px; padding: 5px 8px; font-weight: 700; cursor: pointer; }
+    nav.nav { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid #cbd5e1; display: flex; z-index: 50; }
+    nav.nav button { flex: 1; padding: 12px 6px; border: none; background: #fff; color: #475569; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
+    nav.nav button.active { color: #059669; background: #ecfdf5; }
+    .hide { display: none; }
   </style>
 </head>
 <body>
+  <header>
+    <h1>Finanzas del Hogar</h1>
+    <div class="sub-bar">
+      <input type="month" id="mPicker" />
+      <button type="button" class="btn-top" id="btnSample">Cargar ejemplo</button>
+    </div>
+  </header>
 
-<header>
-  <div class="header-top">
-    <h1>Finanzas del Hogar <span class="pwa-badge" id="offlineStatus">PWA Activa</span></h1>
-    <button class="btn-mini" id="installBtn">+ Instalar App</button>
+  <div class="wrap">
+    <section id="view-balance">
+      <div class="card">
+        <h2>Ingresos mensuales (CLP)</h2>
+        <div class="grid2">
+          <div><label>Luis ($)</label><input type="number" id="inLuis" value="1450000" step="10000" /></div>
+          <div><label>Esposa ($)</label><input type="number" id="inWife" value="1850000" step="10000" /></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Balance y Reparto</h2>
+        <div class="grid2">
+          <div class="box"><div class="k">Gasto Hogar</div><div class="v" id="outHogar">$0</div><div class="s" id="outPers">Personal: $0</div></div>
+          <div class="box"><div class="k">Libre Luis</div><div class="v" id="outLibreL">$0</div><div class="s" id="outLibreW">Libre Esposa: $0</div></div>
+          <div class="box"><div class="k">Aporte Real Luis</div><div class="v" id="outRealL">$0</div><div class="s" id="outRealW">Real Esposa: $0</div></div>
+          <div class="box"><div class="k">Aporte Justo Luis</div><div class="v" id="outJustoL">$0</div><div class="s" id="outJustoW">Justo Esposa: $0</div></div>
+        </div>
+        <div class="msg" id="outMsg">Listo para calcular.</div>
+      </div>
+
+      <div class="card">
+        <h2>Por Método de Pago</h2>
+        <div class="grid3">
+          <div class="box"><div class="k">Transferencia</div><div class="v" id="pTransf">$0</div></div>
+          <div class="box"><div class="k">Débito</div><div class="v" id="pDebito">$0</div></div>
+          <div class="box"><div class="k">T. Crédito</div><div class="v" id="pTC">$0</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-add" class="hide">
+      <div class="card">
+        <h2>Registrar Gasto</h2>
+        <div style="margin-bottom:10px;"><label>Concepto</label><input type="text" id="fDesc" placeholder="Ej: Arriendo, Aceite auto, Médico..." /></div>
+        <div class="grid2" style="margin-bottom:10px;">
+          <div><label>Monto ($)</label><input type="number" id="fAmt" placeholder="50000" /></div>
+          <div>
+            <label>Método de pago</label>
+            <select id="fPay">
+              <option value="Transferencia">Transferencia</option>
+              <option value="Débito">Débito</option>
+              <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid2">
+          <div>
+            <label>¿Quién asume?</label>
+            <select id="fSplit">
+              <option value="50">50% / 50%</option>
+              <option value="70">70% Luis / 30% Ella</option>
+              <option value="100">100% Luis</option>
+              <option value="0">100% Esposa</option>
+            </select>
+          </div>
+          <div>
+            <label>Tipo</label>
+            <select id="fScope">
+              <option value="Hogar">Hogar</option>
+              <option value="Personal">Personal</option>
+            </select>
+          </div>
+        </div>
+        <button type="button" class="btn-save" id="btnAdd">Guardar Gasto</button>
+      </div>
+    </section>
+
+    <section id="view-list" class="hide">
+      <div class="card">
+        <h2>Movimientos (<span id="cntList">0</span>)</h2>
+        <div id="listBox"></div>
+      </div>
+    </section>
   </div>
-  <div class="month-bar">
-    <input type="month" id="monthPicker" />
-    <div style="display:flex; gap:6px;">
-      <button class="btn-mini" id="copyPrevBtn" type="button">Copiar mes anterior</button>
-      <button class="btn-mini" id="templateBtn" type="button">Plantilla base</button>
-    </div>
-  </div>
-</header>
 
-<main class="container">
-  <!-- SECCIÓN 1: RESUMEN Y EQUILIBRIO -->
-  <section id="sec-resumen" class="tab-section">
-    <div class="card">
-      <div class="card-title">
-        <span>1. Ingresos Líquidos del Mes (CLP)</span>
-        <span style="font-size:0.75rem; color:var(--muted);" id="ratioIngresoLabel">44% / 56%</span>
-      </div>
-      <div class="grid-2">
-        <div>
-          <label for="incLuis">Ingreso Luis ($)</label>
-          <input type="number" id="incLuis" step="10000" />
-        </div>
-        <div>
-          <label for="incWife">Ingreso Esposa ($)</label>
-          <input type="number" id="incWife" step="10000" />
-        </div>
-      </div>
-      <div style="margin-top:10px;">
-        <label for="targetPocket">Meta mínima libre en tu bolsillo a fin de mes ($)</label>
-        <input type="number" id="targetPocket" step="10000" />
-      </div>
-    </div>
+  <nav class="nav" id="mainNav">
+    <button type="button" class="active" data-go="balance">Balance</button>
+    <button type="button" class="active" data-go="add" style="background:#fff;color:#475569;">Registrar</button>
+    <button type="button" data-go="list">Movimientos</button>
+  </nav>
 
-    <div class="card">
-      <div class="card-title"><span>2. Balance Real vs. Reparto Justo</span></div>
-      <div class="grid-2">
-        <div class="stat-box">
-          <div class="stat-label">Gasto Total Hogar</div>
-          <div class="stat-val" id="totHogar">$0</div>
-          <div class="stat-sub" id="subGastosPers">Pers: $0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Te queda libre hoy</div>
-          <div class="stat-val" id="luisLibreHoy">$0</div>
-          <div class="stat-sub" id="wifeLibreHoy">Esposa libre: $0</div>
-        </div>
-      </div>
+  <script>
+    (function () {
+      var KEY = 'fh_simple_v1';
+      var store = {};
+      try { store = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { store = {}; }
 
-      <div class="grid-2" style="margin-top:10px;">
-        <div class="stat-box">
-          <div class="stat-label">Aporte Real Actual</div>
-          <div class="stat-val text-blue" id="aporteRealLuis">$0</div>
-          <div class="stat-sub" id="aporteRealWife">Ella aporta: $0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Aporte Justo Proporcional</div>
-          <div class="stat-val text-green" id="aporteJustoLuis">$0</div>
-          <div class="stat-sub" id="aporteJustoWife">Ella debería: $0</div>
-        </div>
-      </div>
+      var picker = document.getElementById('mPicker');
+      var d = new Date();
+      picker.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
 
-      <div id="consejoBox" class="alert-box alert-info">Cargando análisis...</div>
-    </div>
+      function fmt(n) { return '$' + Math.round(Number(n) || 0).toLocaleString('es-CL'); }
 
-    <div class="card">
-      <div class="card-title"><span>3. Desglose por Método de Pago</span></div>
-      <div class="grid-3">
-        <div class="stat-box">
-          <div class="stat-label">Transferencia</div>
-          <div class="stat-val" id="payTransf">$0</div>
-          <div class="stat-sub" id="payTransfSub">L: $0 | E: $0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Débito</div>
-          <div class="stat-val" id="payDebito">$0</div>
-          <div class="stat-sub" id="payDebitoSub">L: $0 | E: $0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">T. Crédito</div>
-          <div class="stat-val text-amber" id="payTC">$0</div>
-          <div class="stat-sub" id="payTCSub">L: $0 | E: $0</div>
-        </div>
-      </div>
-      <div id="tcAlertBox" class="alert-box alert-warn hidden"></div>
-    </div>
-  </section>
-
-  <!-- SECCIÓN 2: AGREGAR / EDITAR GASTO -->
-  <section id="sec-agregar" class="tab-section hidden">
-    <div class="card">
-      <div class="card-title">
-        <span id="formTitle">Registrar Nuevo Gasto</span>
-        <button class="btn-secondary hidden" id="cancelEditBtn" type="button">Cancelar edición</button>
-      </div>
-
-      <div style="margin-bottom:10px;">
-        <label for="expDesc">Concepto o descripción</label>
-        <input type="text" id="expDesc" placeholder="Ej: Arriendo, Supermercado, Cambio de aceite, Médico..." />
-      </div>
-
-      <div class="grid-2" style="margin-bottom:10px;">
-        <div>
-          <label for="expAmount">Monto total ($ CLP)</label>
-          <input type="number" id="expAmount" placeholder="Ej: 85000" />
-        </div>
-        <div>
-          <label for="expCat">Categoría</label>
-          <select id="expCat">
-            <option value="Vivienda y Servicios">Vivienda y Servicios</option>
-            <option value="Colegio Niña">Colegio Niña</option>
-            <option value="Supermercado y Comida">Supermercado y Comida</option>
-            <option value="Auto (Bencina/TAG/Mant.)">Auto (Bencina/TAG/Mant.)</option>
-            <option value="Salud y Farmacia">Salud y Farmacia</option>
-            <option value="Salidas y Restaurantes">Salidas y Restaurantes</option>
-            <option value="Personal / Otros">Personal / Otros</option>
-          </select>
-        </div>
-      </div>
-
-      <div style="margin-bottom:10px;">
-        <label>¿Quién asume este gasto?</label>
-        <div class="chip-group" id="splitTypeChips">
-          <div class="chip active" data-val="50_50">50 / 50</div>
-          <div class="chip" data-val="70_30">70% Luis / 30% Ella</div>
-          <div class="chip" data-val="100_luis">100% Luis</div>
-          <div class="chip" data-val="100_wife">100% Esposa</div>
-          <div class="chip" data-val="custom">% Personalizado</div>
-        </div>
-      </div>
-
-      <div id="customSplitBox" class="hidden" style="margin-bottom:10px; background:var(--surface-2); padding:10px; border-radius:10px;">
-        <label for="customLuisPct">Porcentaje que paga Luis: <strong id="customPctLabel">50%</strong> (Esposa: <span id="customWifePctLabel">50%</span>)</label>
-        <input type="range" id="customLuisPct" min="0" max="100" value="50" style="width:100%;" />
-      </div>
-
-      <div style="margin-bottom:10px;">
-        <label>Método de pago utilizado</label>
-        <div class="chip-group" id="payMethodChips">
-          <div class="chip active-pay" data-val="Transferencia">Transferencia</div>
-          <div class="chip" data-val="Débito">Débito</div>
-          <div class="chip" data-val="Tarjeta de Crédito">Tarjeta de Crédito</div>
-        </div>
-      </div>
-
-      <div style="margin-bottom:6px;">
-        <label>Alcance del gasto</label>
-        <div class="chip-group" id="scopeChips">
-          <div class="chip active" data-val="Hogar">Gasto del Hogar / Familia</div>
-          <div class="chip" data-val="Personal">Gasto Personal Individual</div>
-        </div>
-      </div>
-
-      <button class="btn-primary" id="saveExpBtn" type="button">Guardar Gasto</button>
-    </div>
-  </section>
-
-  <!-- SECCIÓN 3: LISTADO Y EXPORTACIÓN -->
-  <section id="sec-lista" class="tab-section hidden">
-    <div class="card">
-      <div class="card-title">
-        <span>Movimientos del Mes (<span id="countItems">0</span>)</span>
-        <div style="display:flex; gap:6px;">
-          <button class="btn-secondary" id="waBtn" type="button">WhatsApp</button>
-          <button class="btn-secondary" id="csvBtn" type="button">CSV</button>
-        </div>
-      </div>
-
-      <div class="grid-3" style="margin-bottom:10px;">
-        <select id="filterOwner">
-          <option value="ALL">Todos (Responsable)</option>
-          <option value="SHARED">Compartidos</option>
-          <option value="LUIS">100% Luis</option>
-          <option value="WIFE">100% Esposa</option>
-        </select>
-        <select id="filterPay">
-          <option value="ALL">Todos (Pago)</option>
-          <option value="Transferencia">Transferencia</option>
-          <option value="Débito">Débito</option>
-          <option value="Tarjeta de Crédito">T. Crédito</option>
-        </select>
-        <select id="filterScope">
-          <option value="ALL">Hogar + Personal</option>
-          <option value="Hogar">Solo Hogar</option>
-          <option value="Personal">Solo Personal</option>
-        </select>
-      </div>
-
-      <div id="expenseList"></div>
-
-      <div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--border); display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn-secondary" id="exportJsonBtn" type="button">Respaldar JSON</button>
-        <button class="btn-secondary" id="importJsonBtn" type="button">Restaurar JSON</button>
-        <input type="file" id="importJsonInput" accept=".json" class="hidden" />
-      </div>
-    </div>
-  </section>
-</main>
-
-<nav class="tabs" id="bottomTabs">
-  <button class="tab-btn active" data-tab="resumen" type="button">
-    <span>📊</span><span>Balance</span>
-  </button>
-  <button class="tab-btn" data-tab="agregar" type="button">
-    <span>➕</span><span>Registrar</span>
-  </button>
-  <button class="tab-btn" data-tab="lista" type="button">
-    <span>📋</span><span>Movimientos</span>
-  </button>
-</nav>
-
-<script>
-  (function () {
-    const STORAGE_KEY = 'finanzas_hogar_pwa_v2';
-    let db = {};
-    try {
-      db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {};
-    } catch (_) {
-      db = {};
-    }
-
-    let editingId = null;
-    let currentSplit = '50_50';
-    let currentPay = 'Transferencia';
-    let currentScope = 'Hogar';
-
-    const monthPicker = document.getElementById('monthPicker');
-    const now = new Date();
-    monthPicker.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-
-    function saveDB() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-      } catch (_) {}
-    }
-
-    function ensureMonth(m) {
-      if (!m) return;
-      if (!db[m]) {
-        db[m] = {
-          incLuis: 1450000,
-          incWife: 1850000,
-          targetPocket: 350000,
-          expenses: []
-        };
-        saveDB();
+      function monthData() {
+        var m = picker.value || '2026-11';
+        if (!store[m]) store[m] = { luis: 1450000, wife: 1850000, items: [] };
+        return store[m];
       }
-    }
 
-    function fmt(n) {
-      return '$' + Math.round(Number(n) || 0).toLocaleString('es-CL');
-    }
+      function save() {
+        try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {}
+      }
 
-    function switchTab(tab) {
-      ['resumen', 'agregar', 'lista'].forEach((name) => {
-        const sec = document.getElementById(`sec-${name}`);
-        if (sec) sec.classList.toggle('hidden', name !== tab);
+      function goView(v) {
+        document.getElementById('view-balance').className = v === 'balance' ? '' : 'hide';
+        document.getElementById('view-add').className = v === 'add' ? '' : 'hide';
+        document.getElementById('view-list').className = v === 'list' ? '' : 'hide';
+        var btns = document.querySelectorAll('#mainNav button');
+        var names = ['balance', 'add', 'list'];
+        for (var i = 0; i < btns.length; i++) {
+          var isAct = names[i] === v;
+          btns[i].style.background = isAct ? '#ecfdf5' : '#fff';
+          btns[i].style.color = isAct ? '#059669' : '#475569';
+        }
+      }
+
+      function render() {
+        var md = monthData();
+        document.getElementById('inLuis').value = md.luis;
+        document.getElementById('inWife').value = md.wife;
+
+        var totInc = (Number(md.luis) || 0) + (Number(md.wife) || 0);
+        var shareL = totInc > 0 ? Number(md.luis) / totInc : 0.5;
+
+        var hogar = 0, pers = 0, realL = 0, realW = 0, pTr = 0, pDb = 0, pTc = 0;
+        for (var i = 0; i < md.items.length; i++) {
+          var it = md.items[i];
+          var lAmt = it.amt * (Number(it.pct) / 100);
+          var wAmt = it.amt - lAmt;
+          if (it.scope === 'Personal') { pers += it.amt; }
+          else { hogar += it.amt; realL += lAmt; realW += wAmt; }
+          if (it.pay === 'Débito') pDb += it.amt;
+          else if (it.pay === 'Tarjeta de Crédito') pTc += it.amt;
+          else pTr += it.amt;
+        }
+
+        var justoL = hogar * shareL;
+        var justoW = hogar - justoL;
+
+        document.getElementById('outHogar').textContent = fmt(hogar);
+        document.getElementById('outPers').textContent = 'Personal: ' + fmt(pers);
+        document.getElementById('outLibreL').textContent = fmt((Number(md.luis) || 0) - realL);
+        document.getElementById('outLibreW').textContent = 'Libre Esposa: ' + fmt((Number(md.wife) || 0) - realW);
+        document.getElementById('outRealL').textContent = fmt(realL);
+        document.getElementById('outRealW').textContent = 'Real Esposa: ' + fmt(realW);
+        document.getElementById('outJustoL').textContent = fmt(justoL);
+        document.getElementById('outJustoW').textContent = 'Justo Esposa: ' + fmt(justoW);
+        document.getElementById('pTransf').textContent = fmt(pTr);
+        document.getElementById('pDebito').textContent = fmt(pDb);
+        document.getElementById('pTC').textContent = fmt(pTc);
+
+        var diff = realL - justoL;
+        document.getElementById('outMsg').textContent = diff > 10000
+          ? 'Estás poniendo ' + fmt(diff) + ' más que tu proporción (' + Math.round(shareL * 100) + '%). Aporte justo sugerido: ' + fmt(justoL) + '.'
+          : 'Reparto alineado con tu proporción de ingresos (' + Math.round(shareL * 100) + '%).';
+
+        document.getElementById('cntList').textContent = md.items.length;
+        var html = '';
+        for (var j = 0; j < md.items.length; j++) {
+          var x = md.items[j];
+          html += '<div class="item"><div><strong>' + x.desc + '</strong><div style="font-size:0.75rem;color:#64748b;">' + x.pay + ' · ' + x.pct + '% Luis · ' + x.scope + '</div></div><div style="text-align:right;"><strong>' + fmt(x.amt) + '</strong><div><button type="button" class="del" data-idx="' + j + '">X</button></div></div></div>';
+        }
+        document.getElementById('listBox').innerHTML = html || '<p style="color:#64748b;font-size:0.85rem;">Sin movimientos aún.</p>';
+      }
+
+      document.addEventListener('click', function (e) {
+        var t = e.target;
+        while (t && t !== document) {
+          if (t.dataset && t.dataset.go) {
+            goView(t.dataset.go);
+            return;
+          }
+          if (t.classList && t.classList.contains('del') && t.dataset.idx !== undefined) {
+            var md = monthData();
+            md.items.splice(Number(t.dataset.idx), 1);
+            save();
+            render();
+            return;
+          }
+          t = t.parentNode;
+        }
       });
-      document.querySelectorAll('#bottomTabs .tab-btn').forEach((btn) => {
-        btn.classList.toggle('active', btn.dataset.tab === tab);
+
+      document.getElementById('btnAdd').addEventListener('click', function () {
+        var desc = document.getElementById('fDesc').value.trim();
+        var amt = Number(document.getElementById('fAmt').value);
+        if (!desc || !amt || amt <= 0) return;
+        var md = monthData();
+        md.items.unshift({
+          desc: desc,
+          amt: amt,
+          pay: document.getElementById('fPay').value,
+          pct: Number(document.getElementById('fSplit').value),
+          scope: document.getElementById('fScope').value
+        });
+        save();
+        document.getElementById('fDesc').value = '';
+        document.getElementById('fAmt').value = '';
+        render();
+        goView('list');
       });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
 
-    function selectSplitType(val) {
-      currentSplit = val;
-      document.querySelectorAll('#splitTypeChips .chip').forEach((c) => {
-        c.classList.toggle('active', c.dataset.val === val);
+      document.getElementById('btnSample').addEventListener('click', function () {
+        var md = monthData();
+        md.items = [
+          { desc: 'Arriendo y servicios', amt: 1150000, pay: 'Transferencia', pct: 50, scope: 'Hogar' },
+          { desc: 'Colegio niña', amt: 450000, pay: 'Transferencia', pct: 50, scope: 'Hogar' },
+          { desc: 'Comida mes', amt: 550000, pay: 'Débito', pct: 50, scope: 'Hogar' },
+          { desc: 'Bencina y TAG', amt: 350000, pay: 'Débito', pct: 70, scope: 'Hogar' },
+          { desc: 'Médico / remedios', amt: 75000, pay: 'Tarjeta de Crédito', pct: 0, scope: 'Hogar' },
+          { desc: 'Cambio aceite auto', amt: 65000, pay: 'Débito', pct: 100, scope: 'Hogar' }
+        ];
+        save();
+        render();
       });
-      document.getElementById('customSplitBox').classList.toggle('hidden', val !== 'custom');
-    }
 
-    function updateCustomPctLabel() {
-      const v = parseInt(document.getElementById('customLuisPct').value, 10) || 0;
-      document.getElementById('customPctLabel').textContent = `${v}%`;
-      document.getElementById('customWifePctLabel').textContent = `${100 - v}%`;
-    }
+      document.getElementById('inLuis').addEventListener('change', function () { monthData().luis = Number(this.value) || 0; save(); render(); });
+      document.getElementById('inWife').addEventListener('change', function () { monthData().wife = Number(this.value) || 0; save(); render(); });
+      picker.addEventListener('change', render);
 
-    function selectPayMethod(val) {
-      currentPay = val;
-      document.querySelectorAll('#payMethodChips .chip').forEach((c) => {
-        c.classList.toggle('active-pay', c.dataset.val === val);
-      });
-    }
-
-    function selectScope(val) {
-      currentScope = val;
-      document.querySelectorAll('#scopeChips .chip').forEach((c) => {
-        c.classList.toggle('active', c.dataset.val === val);
-      });
-    }
-
-    function saveIncomes() {
-      const m = monthPicker.value;
-      ensureMonth(m);
-      db[m].incLuis = Number(document.getElementById('incLuis').value) || 0;
-      db[m].incWife = Number(document.getElementById('incWife').value) || 0;
-      db[m].targetPocket = Number(document.getElementById('targetPocket').value) || 0;
-      saveDB();
-      renderAll();
-    }
-
-    function getLuisPct(exp) {
-      if (exp.split === '50_50') return 50;
-      if (exp.split === '70_30') return 70;
-      if (exp.split === '100_luis') return 100;
-      if (exp.split === '100_wife') return 0;
-      return Number(exp.luisPct ?? 50);
-    }
-
-    function resetForm() {
-      editingId = null;
-      document.getElementById('formTitle').textContent = 'Registrar Nuevo Gasto';
-      document.getElementById('saveExpBtn').textContent = 'Guardar Gasto';
-      document.getElementById('cancelEditBtn').classList.add('hidden');
-      document.getElementById('expDesc').value = '';
-      document.getElementById('expAmount')
+      goView('balance');
+      render();
+    })();
+  </script>
+</body>
+</html>
