@@ -9,7 +9,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Finanzas Hogar" />
   <link rel="manifest" href="./manifest.json" />
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%230f172a'/><path d='M256 96L104 220h44v176h216V220h44L256 96z' fill='%2310b981'/><rect x='216' y='284' width='80' height='112' rx='12' fill='%230f172a'/><circle cx='256' cy='212' r='26' fill='%230f172a'/></svg>" />
   <title>Finanzas del Hogar - PWA</title>
   <style>
     :root {
@@ -35,7 +34,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 92px; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 96px; -webkit-tap-highlight-color: transparent; }
 
     header {
       background: var(--primary);
@@ -50,7 +49,7 @@
     header h1 { font-size: 1.08rem; font-weight: 700; letter-spacing: -0.2px; }
     .pwa-badge { font-size: 0.7rem; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; padding: 3px 8px; border-radius: 999px; font-weight: 600; }
 
-    .month-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; max-width: 780px; margin: 10px auto 0; }
+    .month-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; max-width: 780px; margin: 10px auto 0; flex-wrap: wrap; }
     .month-bar input[type="month"] {
       background: #1e293b; color: #fff; border: 1px solid #334155;
       padding: 7px 10px; border-radius: 10px; font-size: 0.9rem; font-weight: 600;
@@ -68,7 +67,7 @@
       background: var(--surface); border-radius: var(--radius); padding: 15px;
       box-shadow: var(--shadow); border: 1px solid var(--border);
     }
-    .card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -146,11 +145,12 @@
     .tabs {
       position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
       border-top: 1px solid var(--border); display: flex; justify-content: space-around;
-      padding: 8px 6px calc(8px + env(safe-area-inset-bottom)); z-index: 30;
+      padding: 10px 6px calc(10px + env(safe-area-inset-bottom)); z-index: 99;
     }
     .tab-btn {
-      background: none; border: none; font-size: 0.75rem; font-weight: 700;
+      flex: 1; background: none; border: none; font-size: 0.78rem; font-weight: 700;
       color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer;
+      touch-action: manipulation;
     }
     .tab-btn.active { color: var(--primary); }
     .hidden { display: none !important; }
@@ -160,21 +160,19 @@
 
 <header>
   <div class="header-top">
-    <div>
-      <h1>Finanzas del Hogar <span class="pwa-badge" id="offlineStatus">PWA Lista</span></h1>
-    </div>
+    <h1>Finanzas del Hogar <span class="pwa-badge" id="offlineStatus">PWA Activa</span></h1>
     <button class="btn-mini" id="installBtn">+ Instalar App</button>
   </div>
   <div class="month-bar">
     <input type="month" id="monthPicker" />
     <div style="display:flex; gap:6px;">
-      <button class="btn-mini" onclick="copyPreviousMonth()">Copiar mes anterior</button>
-      <button class="btn-mini" onclick="loadBaseTemplate()">Plantilla base</button>
+      <button class="btn-mini" id="copyPrevBtn" type="button">Copiar mes anterior</button>
+      <button class="btn-mini" id="templateBtn" type="button">Plantilla base</button>
     </div>
   </div>
 </header>
 
-<div class="container">
+<main class="container">
   <!-- SECCIÓN 1: RESUMEN Y EQUILIBRIO -->
   <section id="sec-resumen" class="tab-section">
     <div class="card">
@@ -184,21 +182,21 @@
       </div>
       <div class="grid-2">
         <div>
-          <label>Ingreso Luis ($)</label>
-          <input type="number" id="incLuis" step="10000" onchange="saveIncomes()" />
+          <label for="incLuis">Ingreso Luis ($)</label>
+          <input type="number" id="incLuis" step="10000" />
         </div>
         <div>
-          <label>Ingreso Esposa ($)</label>
-          <input type="number" id="incWife" step="10000" onchange="saveIncomes()" />
+          <label for="incWife">Ingreso Esposa ($)</label>
+          <input type="number" id="incWife" step="10000" />
         </div>
       </div>
       <div style="margin-top:10px;">
-        <label>Meta mínima libre en tu bolsillo a fin de mes ($)</label>
-        <input type="number" id="targetPocket" step="10000" onchange="saveIncomes()" />
+        <label for="targetPocket">Meta mínima libre en tu bolsillo a fin de mes ($)</label>
+        <input type="number" id="targetPocket" step="10000" />
       </div>
     </div>
 
-    <div class="card" style="margin-top:14px;">
+    <div class="card">
       <div class="card-title"><span>2. Balance Real vs. Reparto Justo</span></div>
       <div class="grid-2">
         <div class="stat-box">
@@ -226,10 +224,10 @@
         </div>
       </div>
 
-      <div id="consejoBox" class="alert-box alert-info"></div>
+      <div id="consejoBox" class="alert-box alert-info">Cargando análisis...</div>
     </div>
 
-    <div class="card" style="margin-top:14px;">
+    <div class="card">
       <div class="card-title"><span>3. Desglose por Método de Pago</span></div>
       <div class="grid-3">
         <div class="stat-box">
@@ -257,21 +255,21 @@
     <div class="card">
       <div class="card-title">
         <span id="formTitle">Registrar Nuevo Gasto</span>
-        <button class="btn-secondary hidden" id="cancelEditBtn" onclick="resetForm()">Cancelar edición</button>
+        <button class="btn-secondary hidden" id="cancelEditBtn" type="button">Cancelar edición</button>
       </div>
 
       <div style="margin-bottom:10px;">
-        <label>Concepto o descripción</label>
+        <label for="expDesc">Concepto o descripción</label>
         <input type="text" id="expDesc" placeholder="Ej: Arriendo, Supermercado, Cambio de aceite, Médico..." />
       </div>
 
       <div class="grid-2" style="margin-bottom:10px;">
         <div>
-          <label>Monto total ($ CLP)</label>
+          <label for="expAmount">Monto total ($ CLP)</label>
           <input type="number" id="expAmount" placeholder="Ej: 85000" />
         </div>
         <div>
-          <label>Categoría</label>
+          <label for="expCat">Categoría</label>
           <select id="expCat">
             <option value="Vivienda y Servicios">Vivienda y Servicios</option>
             <option value="Colegio Niña">Colegio Niña</option>
@@ -287,37 +285,37 @@
       <div style="margin-bottom:10px;">
         <label>¿Quién asume este gasto?</label>
         <div class="chip-group" id="splitTypeChips">
-          <div class="chip active" data-val="50_50" onclick="selectSplitType('50_50')">50 / 50</div>
-          <div class="chip" data-val="70_30" onclick="selectSplitType('70_30')">70% Luis / 30% Ella</div>
-          <div class="chip" data-val="100_luis" onclick="selectSplitType('100_luis')">100% Luis</div>
-          <div class="chip" data-val="100_wife" onclick="selectSplitType('100_wife')">100% Esposa</div>
-          <div class="chip" data-val="custom" onclick="selectSplitType('custom')">% Personalizado</div>
+          <div class="chip active" data-val="50_50">50 / 50</div>
+          <div class="chip" data-val="70_30">70% Luis / 30% Ella</div>
+          <div class="chip" data-val="100_luis">100% Luis</div>
+          <div class="chip" data-val="100_wife">100% Esposa</div>
+          <div class="chip" data-val="custom">% Personalizado</div>
         </div>
       </div>
 
       <div id="customSplitBox" class="hidden" style="margin-bottom:10px; background:var(--surface-2); padding:10px; border-radius:10px;">
-        <label>Porcentaje que paga Luis: <strong id="customPctLabel">50%</strong> (Esposa: <span id="customWifePctLabel">50%</span>)</label>
-        <input type="range" id="customLuisPct" min="0" max="100" value="50" style="width:100%;" oninput="updateCustomPctLabel()" />
+        <label for="customLuisPct">Porcentaje que paga Luis: <strong id="customPctLabel">50%</strong> (Esposa: <span id="customWifePctLabel">50%</span>)</label>
+        <input type="range" id="customLuisPct" min="0" max="100" value="50" style="width:100%;" />
       </div>
 
       <div style="margin-bottom:10px;">
         <label>Método de pago utilizado</label>
         <div class="chip-group" id="payMethodChips">
-          <div class="chip active-pay" data-val="Transferencia" onclick="selectPayMethod('Transferencia')">Transferencia</div>
-          <div class="chip" data-val="Débito" onclick="selectPayMethod('Débito')">Débito</div>
-          <div class="chip" data-val="Tarjeta de Crédito" onclick="selectPayMethod('Tarjeta de Crédito')">Tarjeta de Crédito</div>
+          <div class="chip active-pay" data-val="Transferencia">Transferencia</div>
+          <div class="chip" data-val="Débito">Débito</div>
+          <div class="chip" data-val="Tarjeta de Crédito">Tarjeta de Crédito</div>
         </div>
       </div>
 
       <div style="margin-bottom:6px;">
         <label>Alcance del gasto</label>
         <div class="chip-group" id="scopeChips">
-          <div class="chip active" data-val="Hogar" onclick="selectScope('Hogar')">Gasto del Hogar / Familia</div>
-          <div class="chip" data-val="Personal" onclick="selectScope('Personal')">Gasto Personal Individual</div>
+          <div class="chip active" data-val="Hogar">Gasto del Hogar / Familia</div>
+          <div class="chip" data-val="Personal">Gasto Personal Individual</div>
         </div>
       </div>
 
-      <button class="btn-primary" id="saveExpBtn" onclick="saveExpense()">Guardar Gasto</button>
+      <button class="btn-primary" id="saveExpBtn" type="button">Guardar Gasto</button>
     </div>
   </section>
 
@@ -327,25 +325,25 @@
       <div class="card-title">
         <span>Movimientos del Mes (<span id="countItems">0</span>)</span>
         <div style="display:flex; gap:6px;">
-          <button class="btn-secondary" onclick="copyWhatsApp()">WhatsApp</button>
-          <button class="btn-secondary" onclick="exportCSV()">CSV</button>
+          <button class="btn-secondary" id="waBtn" type="button">WhatsApp</button>
+          <button class="btn-secondary" id="csvBtn" type="button">CSV</button>
         </div>
       </div>
 
       <div class="grid-3" style="margin-bottom:10px;">
-        <select id="filterOwner" onchange="renderAll()">
+        <select id="filterOwner">
           <option value="ALL">Todos (Responsable)</option>
           <option value="SHARED">Compartidos</option>
           <option value="LUIS">100% Luis</option>
           <option value="WIFE">100% Esposa</option>
         </select>
-        <select id="filterPay" onchange="renderAll()">
+        <select id="filterPay">
           <option value="ALL">Todos (Pago)</option>
           <option value="Transferencia">Transferencia</option>
           <option value="Débito">Débito</option>
           <option value="Tarjeta de Crédito">T. Crédito</option>
         </select>
-        <select id="filterScope" onchange="renderAll()">
+        <select id="filterScope">
           <option value="ALL">Hogar + Personal</option>
           <option value="Hogar">Solo Hogar</option>
           <option value="Personal">Solo Personal</option>
@@ -355,104 +353,129 @@
       <div id="expenseList"></div>
 
       <div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--border); display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn-secondary" onclick="exportBackupJSON()">Respaldar JSON</button>
-        <button class="btn-secondary" onclick="document.getElementById('importJsonInput').click()">Restaurar JSON</button>
-        <input type="file" id="importJsonInput" accept=".json" class="hidden" onchange="importBackupJSON(event)" />
+        <button class="btn-secondary" id="exportJsonBtn" type="button">Respaldar JSON</button>
+        <button class="btn-secondary" id="importJsonBtn" type="button">Restaurar JSON</button>
+        <input type="file" id="importJsonInput" accept=".json" class="hidden" />
       </div>
     </div>
   </section>
-</div>
+</main>
 
-<nav class="tabs">
-  <button class="tab-btn active" id="tab-resumen" onclick="switchTab('resumen')">
+<nav class="tabs" id="bottomTabs">
+  <button class="tab-btn active" data-tab="resumen" type="button">
     <span>📊</span><span>Balance</span>
   </button>
-  <button class="tab-btn" id="tab-agregar" onclick="switchTab('agregar')">
+  <button class="tab-btn" data-tab="agregar" type="button">
     <span>➕</span><span>Registrar</span>
   </button>
-  <button class="tab-btn" id="tab-lista" onclick="switchTab('lista')">
+  <button class="tab-btn" data-tab="lista" type="button">
     <span>📋</span><span>Movimientos</span>
   </button>
 </nav>
 
 <script>
-  // Registro del Service Worker PWA
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
-    });
-  }
-
-  // Botón de instalación PWA
-  let deferredPrompt;
-  const installBtn = document.getElementById('installBtn');
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.style.display = 'inline-block';
-  });
-  installBtn.addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    installBtn.style.display = 'none';
-  });
-
-  function updateOnlineStatus() {
-    const badge = document.getElementById('offlineStatus');
-    badge.textContent = navigator.onLine ? 'PWA Activa' : 'Modo Offline';
-  }
-  window.addEventListener('online', updateOnlineStatus);
-  window.addEventListener('offline', updateOnlineStatus);
-
-  // Estado y almacenamiento
-  const STORAGE_KEY = 'finanzas_hogar_pwa_v1';
-  let db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-  let editingId = null;
-  let currentSplit = '50_50';
-  let currentPay = 'Transferencia';
-  let currentScope = 'Hogar';
-
-  const monthPicker = document.getElementById('monthPicker');
-  const now = new Date();
-  monthPicker.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  monthPicker.addEventListener('change', () => {
-    resetForm();
-    ensureMonth(monthPicker.value);
-    renderAll();
-  });
-
-  function ensureMonth(m) {
-    if (!db[m]) {
-      db[m] = {
-        incLuis: 1450000,
-        incWife: 1850000,
-        targetPocket: 350000,
-        expenses: []
-      };
-      saveDB();
+  (function () {
+    const STORAGE_KEY = 'finanzas_hogar_pwa_v2';
+    let db = {};
+    try {
+      db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {};
+    } catch (_) {
+      db = {};
     }
-  }
 
-  function saveDB() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-  }
+    let editingId = null;
+    let currentSplit = '50_50';
+    let currentPay = 'Transferencia';
+    let currentScope = 'Hogar';
 
-  function fmt(n) {
-    return '$' + Math.round(n || 0).toLocaleString('es-CL');
-  }
+    const monthPicker = document.getElementById('monthPicker');
+    const now = new Date();
+    monthPicker.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
-  function switchTab(tab) {
-    document.querySelectorAll('.tab-section').forEach(s => s.classList.add('hidden'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(`sec-${tab}`).classList.remove('hidden');
-    document.getElementById(`tab-${tab}`).classList.add('active');
-  }
+    function saveDB() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+      } catch (_) {}
+    }
 
-  function selectSplitType(val) {
-    currentSplit = val;
-    document.querySelectorAll('#splitTypeChips .chip').forEach(c => {
-      c.classList.toggle('active', c.dataset.val === val);
-    });
-    document.getElementById('customSplitBox').classList.toggle('hid
+    function ensureMonth(m) {
+      if (!m) return;
+      if (!db[m]) {
+        db[m] = {
+          incLuis: 1450000,
+          incWife: 1850000,
+          targetPocket: 350000,
+          expenses: []
+        };
+        saveDB();
+      }
+    }
+
+    function fmt(n) {
+      return '$' + Math.round(Number(n) || 0).toLocaleString('es-CL');
+    }
+
+    function switchTab(tab) {
+      ['resumen', 'agregar', 'lista'].forEach((name) => {
+        const sec = document.getElementById(`sec-${name}`);
+        if (sec) sec.classList.toggle('hidden', name !== tab);
+      });
+      document.querySelectorAll('#bottomTabs .tab-btn').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function selectSplitType(val) {
+      currentSplit = val;
+      document.querySelectorAll('#splitTypeChips .chip').forEach((c) => {
+        c.classList.toggle('active', c.dataset.val === val);
+      });
+      document.getElementById('customSplitBox').classList.toggle('hidden', val !== 'custom');
+    }
+
+    function updateCustomPctLabel() {
+      const v = parseInt(document.getElementById('customLuisPct').value, 10) || 0;
+      document.getElementById('customPctLabel').textContent = `${v}%`;
+      document.getElementById('customWifePctLabel').textContent = `${100 - v}%`;
+    }
+
+    function selectPayMethod(val) {
+      currentPay = val;
+      document.querySelectorAll('#payMethodChips .chip').forEach((c) => {
+        c.classList.toggle('active-pay', c.dataset.val === val);
+      });
+    }
+
+    function selectScope(val) {
+      currentScope = val;
+      document.querySelectorAll('#scopeChips .chip').forEach((c) => {
+        c.classList.toggle('active', c.dataset.val === val);
+      });
+    }
+
+    function saveIncomes() {
+      const m = monthPicker.value;
+      ensureMonth(m);
+      db[m].incLuis = Number(document.getElementById('incLuis').value) || 0;
+      db[m].incWife = Number(document.getElementById('incWife').value) || 0;
+      db[m].targetPocket = Number(document.getElementById('targetPocket').value) || 0;
+      saveDB();
+      renderAll();
+    }
+
+    function getLuisPct(exp) {
+      if (exp.split === '50_50') return 50;
+      if (exp.split === '70_30') return 70;
+      if (exp.split === '100_luis') return 100;
+      if (exp.split === '100_wife') return 0;
+      return Number(exp.luisPct ?? 50);
+    }
+
+    function resetForm() {
+      editingId = null;
+      document.getElementById('formTitle').textContent = 'Registrar Nuevo Gasto';
+      document.getElementById('saveExpBtn').textContent = 'Guardar Gasto';
+      document.getElementById('cancelEditBtn').classList.add('hidden');
+      document.getElementById('expDesc').value = '';
+      document.getElementById('expAmount')
