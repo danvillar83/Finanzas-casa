@@ -1,3 +1,4 @@
+{
   "name":"Finanzas del Hogar",
   "short_name":"Mi Hogar",
   "description":"Control familiar de ingresos, gastos y metas de ahorro",
@@ -12,3 +13,4 @@
     {"src":"./icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
   ]
 }
+
