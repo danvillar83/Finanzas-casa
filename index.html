@@ -21,6 +21,7 @@
       --amber: #d97706;
       --amber-soft: #fef3c7;
       --danger: #dc2626;
+      --danger-soft: #fee2e2;
       --text: #0f172a;
       --muted: #64748b;
       --border: #e2e8f0;
@@ -29,7 +30,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 96px; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 98px; }
 
     header {
       background: var(--primary); color: #fff; padding: 15px 16px;
@@ -128,14 +129,31 @@
     .bar-fill { height: 100%; border-radius: 999px; transition: width 0.25s ease; }
     .bar-general { background: var(--blue); }
     .bar-personal { background: var(--purple); }
+    .bar-goal { background: var(--accent); }
+
+    .goal-card {
+      border: 1px solid var(--border); border-radius: 12px; padding: 12px;
+      background: var(--surface-2); margin-bottom: 10px;
+    }
+    .goal-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+    .goal-name { font-weight: 700; font-size: 0.94rem; }
+    .goal-pct { font-weight: 800; font-size: 0.86rem; color: var(--accent); }
+    .goal-nums { font-size: 0.78rem; color: var(--muted); margin-bottom: 7px; }
+    .goal-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .btn-goal {
+      background: #fff; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 9px; font-size: 0.75rem; font-weight: 700; cursor: pointer; color: var(--text);
+    }
+    .btn-goal.add { background: var(--accent-soft); border-color: #a7f3d0; color: #065f46; }
+    .btn-goal.del { background: var(--danger-soft); border-color: #fecaca; color: #991b1b; }
 
     .tabs {
       position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
       border-top: 1px solid var(--border); display: flex; justify-content: space-around;
-      padding: 9px 4px calc(9px + env(safe-area-inset-bottom)); z-index: 99;
+      padding: 8px 2px calc(8px + env(safe-area-inset-bottom)); z-index: 99;
     }
     .tab-btn {
-      flex: 1; background: none; border: none; font-size: 0.72rem; font-weight: 700;
+      flex: 1; background: none; border: none; font-size: 0.68rem; font-weight: 700;
       color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer;
     }
     .tab-btn.active { color: var(--primary); }
@@ -146,7 +164,7 @@
 
 <header>
   <div class="header-top">
-    <h1>Finanzas del Hogar <span class="pwa-badge" id="offlineStatus">PWA v5</span></h1>
+    <h1>Finanzas del Hogar <span class="pwa-badge" id="offlineStatus">PWA v5 + Metas</span></h1>
     <button class="btn-mini" id="installBtn" type="button">+ Instalar App</button>
   </div>
   <div class="month-bar">
@@ -159,6 +177,7 @@
 </header>
 
 <main class="container">
+  <!-- 1. BALANCE -->
   <section id="sec-resumen" class="tab-section">
     <div class="card">
       <div class="card-title">
@@ -235,6 +254,7 @@
     </div>
   </section>
 
+  <!-- 2. REGISTRAR -->
   <section id="sec-agregar" class="tab-section hidden">
     <div class="card">
       <div class="card-title">
@@ -303,6 +323,7 @@
     </div>
   </section>
 
+  <!-- 3. MOVIMIENTOS -->
   <section id="sec-lista" class="tab-section hidden">
     <div class="card">
       <div class="card-title">
@@ -343,6 +364,7 @@
     </div>
   </section>
 
+  <!-- 4. GRÁFICOS -->
   <section id="sec-graficos" class="tab-section hidden">
     <div class="card">
       <div class="card-title"><span>Resumen: General (Hogar) vs. Personal</span></div>
@@ -370,87 +392,52 @@
       <div id="chartPersonalBars"></div>
     </div>
   </section>
+
+  <!-- 5. METAS DE AHORRO -->
+  <section id="sec-metas" class="tab-section hidden">
+    <div class="card">
+      <div class="card-title"><span>Resumen de Ahorro por Metas</span></div>
+      <div class="grid-2">
+        <div class="stat-box">
+          <div class="stat-label">Total Ahorrado en Metas</div>
+          <div class="stat-val text-green" id="goalsSavedTotal">$0</div>
+          <div class="stat-sub" id="goalsTargetTotal">Meta total: $0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Tu saldo libre estimado este mes</div>
+          <div class="stat-val text-blue" id="goalsMonthFree">$0</div>
+          <div class="stat-sub">Referencia del mes seleccionado</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>Nueva Meta de Ahorro</span></div>
+      <div style="margin-bottom:10px;">
+        <label for="goalName">Nombre de la meta</label>
+        <input type="text" id="goalName" placeholder="Ej: Fondo de emergencia, Mantención auto, Paseos..." />
+      </div>
+      <div class="grid-2">
+        <div>
+          <label for="goalTarget">Monto objetivo ($ CLP)</label>
+          <input type="number" id="goalTarget" placeholder="Ej: 500000" />
+        </div>
+        <div>
+          <label for="goalCurrent">Monto inicial ahorrado ($ CLP)</label>
+          <input type="number" id="goalCurrent" placeholder="0" value="0" />
+        </div>
+      </div>
+      <button class="btn-primary" id="saveGoalBtn" type="button">Crear Meta</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>Mis Metas (<span id="goalsCount">0</span>)</span></div>
+      <div id="goalsList"></div>
+    </div>
+  </section>
 </main>
 
 <nav class="tabs" id="bottomTabs">
   <button class="tab-btn active" data-tab="resumen" type="button"><span>📊</span><span>Balance</span></button>
   <button class="tab-btn" data-tab="agregar" type="button"><span>➕</span><span>Registrar</span></button>
-  <button class="tab-btn" data-tab="lista" type="button"><span>📋</span><span>Movimientos</span></button>
-  <button class="tab-btn" data-tab="graficos" type="button"><span>📈</span><span>Gráficos</span></button>
-</nav>
-
-<script>
-  (function () {
-    const STORAGE_KEY = 'finanzas_hogar_pwa_v5';
-    const LEGACY_KEYS = ['finanzas_hogar_pwa_v3', 'finanzas_hogar_pwa_v2', 'finanzas_hogar_pwa_v1'];
-
-    let db = {};
-    try { db = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {}; } catch (_) { db = {}; }
-
-    // Migra automáticamente datos de versiones anteriores si existen
-    if (!Object.keys(db).length) {
-      for (const k of LEGACY_KEYS) {
-        try {
-          const old = JSON.parse(localStorage.getItem(k) || 'null');
-          if (old && typeof old === 'object' && Object.keys(old).length) {
-            db = old;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-            break;
-          }
-        } catch (_) {}
-      }
-    }
-
-    let editingId = null;
-    let currentSplit = '50_50';
-    let currentPay = 'Transferencia';
-    let currentScope = 'Hogar';
-
-    const monthPicker = document.getElementById('monthPicker');
-    const now = new Date();
-    monthPicker.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-
-    function saveDB() {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } catch (_) {}
-    }
-
-    function ensureMonth(m) {
-      const key = m || monthPicker.value || '2026-11';
-      if (!db[key]) {
-        db[key] = { incLuis: 1450000, incWife: 1850000, targetPocket: 350000, expenses: [] };
-        saveDB();
-      }
-      return db[key];
-    }
-
-    function fmt(n) {
-      return '$' + Math.round(Number(n) || 0).toLocaleString('es-CL');
-    }
-
-    function switchTab(tab) {
-      const map = { resumen: 'sec-resumen', agregar: 'sec-agregar', lista: 'sec-lista', graficos: 'sec-graficos' };
-      const targetId = map[tab] || 'sec-resumen';
-      document.querySelectorAll('.tab-section').forEach((sec) => {
-        if (sec.id === targetId) sec.classList.remove('hidden');
-        else sec.classList.add('hidden');
-      });
-      document.querySelectorAll('#bottomTabs .tab-btn').forEach((btn) => {
-        btn.classList.toggle('active', btn.dataset.tab === tab);
-      });
-      window.scrollTo(0, 0);
-    }
-
-    function selectSplitType(val) {
-      currentSplit = val;
-      document.querySelectorAll('#splitTypeChips .chip').forEach((c) => c.classList.toggle('active', c.dataset.val === val));
-      document.getElementById('customSplitBox').classList.toggle('hidden', val !== 'custom');
-    }
-
-    function updateCustomPctLabel() {
-      const v = parseInt(document.getElementById('customLuisPct').value, 10) || 0;
-      document.getElementById('customPctLabel').textContent = `${v}%`;
-      document.getElementById('customWifePctLabel').textContent = `${100 - v}%`;
-    }
-
-    function selectPayMethod(val) {
-      currentPay
+  <button class="tab-btn" data-tab="lista" type="button"><span>📋</span><span>Movimiento
